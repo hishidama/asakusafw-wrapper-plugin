@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="asakusafwConfiguration" name="Asakusa Framework configuration" schema="schema/asakusafwWrapperConfiguration.exsd"/>
+   <extension
+         point="jp.hishidama.asakusafw_wrapper.asakusafwConfiguration">
+      <classpath
+            class="jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.config.AsakusaFramework04Configration">
+      </classpath>
+      <classpath
+            class="jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.config.AsakusaFramework05Configration">
+      </classpath>
+   </extension>
+
+   <extension
+         point="org.eclipse.jdt.launching.classpathProviders">
+      <classpathProvider
+            class="jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.task.DmdlClasspathProvider"
+            id="jp.hishidama.asakusafwWrapper.dmdl.dmdlClasspathProvider">
+      </classpathProvider>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            id="jp.hishidama.asakusafwWrapper.category"
+            name="Asakusa Framework Wrapper">
+      </category>
+      <command
+            categoryId="jp.hishidama.asakusafwWrapper.category"
+            id="jp.hishidama.asakusafwWrapper.command.dmdlErrorCheck"
+            name="DMDL error check">
+      </command>
+      <command
+            categoryId="jp.hishidama.asakusafwWrapper.category"
+            id="jp.hishidama.asakusafwWrapper.command.dmdlCompile"
+            name="DMDL compile">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.handler.DMDLErrorCheckHandler"
+            commandId="jp.hishidama.asakusafwWrapper.command.dmdlErrorCheck">
+      </handler>
+      <handler
+            class="jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.handler.DMDLCompileHandler"
+            commandId="jp.hishidama.asakusafwWrapper.command.dmdlCompile">
+      </handler>
+   </extension>
+</plugin>
