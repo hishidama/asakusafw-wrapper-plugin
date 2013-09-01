@@ -10,7 +10,7 @@ import jp.hishidama.eclipse_plugin.asakusafw_wrapper.dmdl.DmdlParseErrorInfo;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.dmdl.DmdlParserWrapper;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.Activator;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.LogUtil;
-import jp.hishidama.eclipse_plugin.asakusafw_wrapper.util.DmdlFileUtil;
+import jp.hishidama.eclipse_plugin.asakusafw_wrapper.util.DMDLFileUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -66,7 +66,7 @@ public class DMDLErrorCheckTask implements IRunnableWithProgress {
 		monitor.beginTask("DMDL error check", 100);
 		try {
 			cancelCheck(monitor);
-			List<IFile> list = DmdlFileUtil.getDmdlFiles(project);
+			List<IFile> list = DMDLFileUtil.getDmdlFiles(project);
 			monitor.worked(10);
 
 			cancelCheck(monitor);

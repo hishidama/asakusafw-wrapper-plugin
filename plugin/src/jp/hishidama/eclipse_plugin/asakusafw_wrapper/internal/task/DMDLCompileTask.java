@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.config.AsakusafwProperties;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.Activator;
-import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.util.BuildPropertiesUtil;
+import jp.hishidama.eclipse_plugin.asakusafw_wrapper.util.BuildPropertiesUtil;
 import jp.hishidama.eclipse_plugin.util.FileUtil;
 
 import org.eclipse.core.resources.IFile;

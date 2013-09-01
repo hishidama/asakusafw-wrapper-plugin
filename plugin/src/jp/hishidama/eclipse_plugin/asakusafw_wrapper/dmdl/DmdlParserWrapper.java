@@ -129,7 +129,10 @@ public class DmdlParserWrapper {
 					IStatus status = LogUtil.warnStatus(MessageFormat.format(
 							"DmdlParser#parse() error.\nexception={0}\nmessage={1}", t.getClass().getName(),
 							t.getMessage()), t);
-					ErrorDialog.openError(null, "error", taskName0 + "にエラーが発生しました。", status);
+					String message = MessageFormat
+							.format("{0}にエラーが発生しました。\nDMDLパーサーに必要なライブラリーが指定されていない可能性があります。\nプロパティーページでAsakusa FrameworkおよびDmdlParserの設定を確認してください。",
+									taskName0);
+					ErrorDialog.openError(null, "error", message, status);
 				}
 			});
 		}

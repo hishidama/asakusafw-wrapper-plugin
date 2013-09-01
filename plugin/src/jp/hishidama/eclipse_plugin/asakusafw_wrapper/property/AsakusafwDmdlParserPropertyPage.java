@@ -7,8 +7,8 @@ import jp.hishidama.eclipse_plugin.asakusafw_wrapper.extension.AsakusafwConfigur
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.extension.AsakusafwConfiguration.Library;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.LogUtil;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.task.DMDLErrorCheckTask;
-import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.util.BuildPropertiesUtil;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.util.ParserClassUtil;
+import jp.hishidama.eclipse_plugin.asakusafw_wrapper.util.BuildPropertiesUtil;
 import jp.hishidama.eclipse_plugin.dialog.NewVariableEntryDialog;
 import jp.hishidama.eclipse_plugin.dialog.ProjectFileSelectionDialog;
 

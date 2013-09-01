@@ -1,4 +1,4 @@
-package jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.util;
+package jp.hishidama.eclipse_plugin.asakusafw_wrapper.util;
 
 import java.io.FileNotFoundException;
 import java.text.MessageFormat;
@@ -7,6 +7,7 @@ import jp.hishidama.eclipse_plugin.asakusafw_wrapper.config.AsakusafwProperties;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.extension.AsakusafwConfiguration;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.Activator;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.LogUtil;
+import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.util.ParserClassUtil;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
