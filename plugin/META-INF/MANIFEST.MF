@@ -21,6 +21,7 @@ Bundle-ClassPath: plugin.jar,
 Export-Package: jp.hishidama.eclipse_plugin.asakusafw_wrapper.config,
  jp.hishidama.eclipse_plugin.asakusafw_wrapper.dmdl,
  jp.hishidama.eclipse_plugin.asakusafw_wrapper.extension,
+ jp.hishidama.eclipse_plugin.asakusafw_wrapper.handler,
  jp.hishidama.eclipse_plugin.asakusafw_wrapper.property,
  jp.hishidama.eclipse_plugin.asakusafw_wrapper.util
 Import-Package: org.eclipse.jface.text

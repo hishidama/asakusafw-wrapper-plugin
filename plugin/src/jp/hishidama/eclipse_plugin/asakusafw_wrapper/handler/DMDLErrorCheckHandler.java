@@ -1,4 +1,4 @@
-package jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.handler;
+package jp.hishidama.eclipse_plugin.asakusafw_wrapper.handler;
 
 import java.lang.reflect.InvocationTargetException;
 

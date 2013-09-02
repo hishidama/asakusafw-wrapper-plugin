@@ -39,7 +39,7 @@
    <extension
          point="org.eclipse.ui.handlers">
       <handler
-            class="jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.handler.DMDLErrorCheckHandler"
+            class="jp.hishidama.eclipse_plugin.asakusafw_wrapper.handler.DMDLErrorCheckHandler"
             commandId="jp.hishidama.asakusafwWrapper.command.dmdlErrorCheck">
       </handler>
       <handler
