@@ -122,7 +122,7 @@ public class DMDLFileUtil {
 		}
 		for (IResource r : members) {
 			if (r instanceof IFile) {
-				if (r.getFullPath().getFileExtension().equals("dmdl")) {
+				if ("dmdl".equals(r.getFileExtension())) {
 					list.add((IFile) r);
 				}
 			} else if (r instanceof IContainer) {
