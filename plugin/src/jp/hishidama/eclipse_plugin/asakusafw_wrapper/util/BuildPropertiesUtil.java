@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Display;
 
 public class BuildPropertiesUtil {
 
-	private static final String PARSER_BUILD_PROPERTIES = "AsakusafwWrapper.buildProperties";
+	private static final String PARSER_BUILD_PROPERTIES = ParserClassUtil.PARSER_BUILD_PROPERTIES;
 
 	public static String getBuildPropertiesFileName(IProject project) {
 		ParserClassUtil.initializeProjectParser(project);
