@@ -88,6 +88,9 @@ public class DmdlParserCaller {
 	}
 
 	protected Object[] createResult(int level, String message, Region region) {
+		if (region == null) {
+			return new Object[] { null, level, message, -1, 0, -1, 0 };
+		}
 		return new Object[] { region.sourceFile, level, message, region.beginLine, region.beginColumn, region.endLine,
 				region.endColumn };
 	}

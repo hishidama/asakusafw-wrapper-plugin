@@ -114,8 +114,10 @@ public class DMDLErrorCheckTask implements IRunnableWithProgress {
 			for (DmdlParseErrorInfo pe : list) {
 				cancelCheck(monitor);
 				IFile file = fileMap.get(pe.file);
-				IDocument document = getDocument(provider, file);
-				createErrorMarker(file, document, pe);
+				if (file != null) {
+					IDocument document = getDocument(provider, file);
+					createErrorMarker(file, document, pe);
+				}
 			}
 		}
 	}
