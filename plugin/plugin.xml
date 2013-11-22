@@ -10,6 +10,9 @@
       <classpath
             class="jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.config.AsakusaFramework05Configration">
       </classpath>
+      <classpath
+            class="jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.config.AsakusaFramework05GradleExperimentalConfigration">
+      </classpath>
    </extension>
 
    <extension
