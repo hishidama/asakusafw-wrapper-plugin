@@ -5,16 +5,21 @@ import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 
-public class AsakusaFramework05GradleExperimentalConfigration extends AsakusaFrameworkGradleConfigration {
+public class AsakusaFramework052GradleConfigration extends AsakusaFrameworkGradleConfigration {
 
 	@Override
 	public String getConfigurationName() {
-		return "Asakusa Framework 0.5 gradle(experimental)";
+		return "Asakusa Framework 0.5.2 gradle(experimental)";
 	}
 
 	@Override
-	protected String getVersionPrefix() {
-		return "0.5";
+	public String getVersionMin() {
+		return "0.5.2";
+	}
+
+	@Override
+	public String getVersionMax() {
+		return "ANY";
 	}
 
 	@Override

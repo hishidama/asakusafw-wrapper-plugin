@@ -54,14 +54,14 @@ public class AsakusafwVersionPropertyPage extends PropertyPage {
 		}
 
 		versionTable = new Table(composite, SWT.BORDER | SWT.CHECK);
-		GridData grid = GridDataFactory.swtDefaults().minSize(256, 20 * 4).hint(256, 20 * 4).create();
+		GridData grid = GridDataFactory.swtDefaults().minSize(256, 20 * 4).hint(256 + 128, 20 * 4).create();
 		versionTable.setLayoutData(grid);
 		versionTable.setHeaderVisible(false);
 		versionTable.setLinesVisible(true);
 		SwtCheckedTableUtil.setSingleCheckedTable(versionTable);
 
 		TableColumn col = new TableColumn(versionTable, SWT.NONE);
-		col.setWidth(256);
+		col.setWidth(256 + 128);
 		col.setText("version name");
 
 		IProject project = getProject();

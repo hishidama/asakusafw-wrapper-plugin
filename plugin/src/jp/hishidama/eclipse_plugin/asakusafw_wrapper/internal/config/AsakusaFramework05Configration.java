@@ -13,8 +13,13 @@ public class AsakusaFramework05Configration extends AsakusaFrameworkConfigration
 	}
 
 	@Override
-	protected String getVersionPrefix() {
+	public String getVersionMin() {
 		return "0.5";
+	}
+
+	@Override
+	public String getVersionMax() {
+		return "ANY";
 	}
 
 	@Override

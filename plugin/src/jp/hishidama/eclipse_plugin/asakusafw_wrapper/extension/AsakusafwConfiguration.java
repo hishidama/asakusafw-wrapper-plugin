@@ -22,6 +22,22 @@ public abstract class AsakusafwConfiguration {
 	public abstract String getConfigurationName();
 
 	/**
+	 * 対象最低バージョン.
+	 * 
+	 * @return バージョン
+	 * @since 2013.11.22
+	 */
+	public abstract String getVersionMin();
+
+	/**
+	 * 対象最高バージョン.
+	 * 
+	 * @return バージョン
+	 * @since 2013.11.22
+	 */
+	public abstract String getVersionMax();
+
+	/**
 	 * 該当プロジェクトを受け付けられるかどうか.
 	 * 
 	 * @param project
@@ -29,6 +45,70 @@ public abstract class AsakusafwConfiguration {
 	 * @return true：受け付けられる
 	 */
 	public abstract boolean acceptable(IProject project);
+
+	/**
+	 * バージョン確認.
+	 * 
+	 * @param version
+	 *            バージョン
+	 * @param min
+	 *            範囲：最低バージョン
+	 * @param max
+	 *            範囲：最高バージョン
+	 * @return true：バージョンが範囲に含まれる場合
+	 * @since 2013.11.22
+	 */
+	public static boolean containsVersion(String version, String min, String max) {
+		return compareVersion(min, version) <= 0 && compareVersion(version, max) <= 0;
+	}
+
+	/**
+	 * バージョン比較.
+	 * <ul>
+	 * <li>ピリオドおよびハイフンでバージョン文字列を分割し、各部分を数値として比較する。</li>
+	 * <li>分割された個数が少ない方は、足りない部分を0として扱う。</li>
+	 * <li>分割された部分が数値でない場合は最大整数として扱う。</li>
+	 * </ul>
+	 * 
+	 * @param ver1
+	 *            バージョン1
+	 * @param ver2
+	 *            バージョン2
+	 * @return 等しいとき0、ver1&lt;ver2のとき負の数、ver1&gt;ver2のとき正の数
+	 * @since 2013.11.22
+	 */
+	public static int compareVersion(String ver1, String ver2) {
+		if (ver1 == null) {
+			ver1 = "ANY";
+		}
+		if (ver2 == null) {
+			ver2 = "ANY";
+		}
+		String[] ss1 = ver1.split("\\.|\\-");
+		String[] ss2 = ver2.split("\\.|\\-");
+		int n = Math.max(ss1.length, ss2.length);
+		for (int i = 0; i < n; i++) {
+			String s1 = (i < ss1.length) ? ss1[i] : "0";
+			String s2 = (i < ss2.length) ? ss2[i] : "0";
+			int n1;
+			try {
+				n1 = Integer.parseInt(s1);
+			} catch (Exception e) {
+				n1 = Integer.MAX_VALUE;
+			}
+			int n2;
+			try {
+				n2 = Integer.parseInt(s2);
+			} catch (Exception e) {
+				n2 = Integer.MAX_VALUE;
+			}
+			int c = n1 - n2;
+			if (c != 0) {
+				return c;
+			}
+		}
+		return 0;
+	}
 
 	/**
 	 * build.propertiesファイルのデフォルトの場所.

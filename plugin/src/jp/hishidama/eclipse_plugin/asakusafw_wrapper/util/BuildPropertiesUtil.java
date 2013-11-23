@@ -20,6 +20,13 @@ public class BuildPropertiesUtil {
 
 	private static final String PARSER_BUILD_PROPERTIES = ParserClassUtil.PARSER_BUILD_PROPERTIES;
 
+	public static AsakusafwConfiguration getAsakusafwConfiguration(IProject project) {
+		ParserClassUtil.initializeProjectParser(project);
+
+		AsakusafwConfiguration c = ParserClassUtil.getConfiguration(project);
+		return c;
+	}
+
 	public static String getBuildPropertiesFileName(IProject project) {
 		ParserClassUtil.initializeProjectParser(project);
 
@@ -27,9 +34,7 @@ public class BuildPropertiesUtil {
 	}
 
 	public static String getDefaultBuildPropertiesFileName(IProject project) {
-		ParserClassUtil.initializeProjectParser(project);
-
-		AsakusafwConfiguration c = ParserClassUtil.getConfiguration(project);
+		AsakusafwConfiguration c = getAsakusafwConfiguration(project);
 		if (c != null) {
 			return c.getDefaultBuildPropertiesPath();
 		}

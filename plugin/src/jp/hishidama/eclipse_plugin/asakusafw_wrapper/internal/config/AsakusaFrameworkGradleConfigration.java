@@ -18,10 +18,8 @@ public abstract class AsakusaFrameworkGradleConfigration extends AsakusafwConfig
 		if (version == null) {
 			return false;
 		}
-		return version.startsWith(getVersionPrefix());
+		return containsVersion(version, getVersionMin(), getVersionMax());
 	}
-
-	protected abstract String getVersionPrefix();
 
 	@Override
 	public String getDefaultBuildPropertiesPath() {

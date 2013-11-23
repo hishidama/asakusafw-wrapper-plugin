@@ -28,10 +28,8 @@ public abstract class AsakusaFrameworkConfigration extends AsakusafwConfiguratio
 		if (version == null) {
 			return false;
 		}
-		return version.startsWith(getVersionPrefix());
+		return containsVersion(version, getVersionMin(), getVersionMax());
 	}
-
-	protected abstract String getVersionPrefix();
 
 	@Override
 	public String getDefaultBuildPropertiesPath() {
