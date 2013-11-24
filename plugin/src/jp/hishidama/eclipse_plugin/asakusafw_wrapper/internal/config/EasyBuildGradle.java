@@ -39,7 +39,7 @@ public class EasyBuildGradle extends AsakusafwProperties {
 
 	@Override
 	public String getModelgenOutput() {
-		return "target/generated-sources/modelgen";
+		return "build/generated-sources/modelgen";
 	}
 
 	@Override
