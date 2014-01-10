@@ -3,23 +3,24 @@ package jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.config;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.config.AsakusafwProperties;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.extension.AsakusafwConfiguration;
-import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.util.BuildGradleUtil;
+import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.util.GradlePrefsUtil;
 
 import org.eclipse.core.resources.IProject;
 
-public class AsakusaFramework052GradleConfigration extends AsakusafwConfiguration {
+public class AsakusaFramework053GradleConfigration extends AsakusafwConfiguration {
 
 	@Override
 	public String getConfigurationName() {
-		return "Asakusa Framework 0.5.2 gradle(experimental)";
+		return "Asakusa Framework 0.5.3 gradle";
 	}
 
 	@Override
 	public String getVersionMin() {
-		return "0.5.2";
+		return "0.5.3";
 	}
 
 	@Override
@@ -29,8 +30,8 @@ public class AsakusaFramework052GradleConfigration extends AsakusafwConfiguratio
 
 	@Override
 	public boolean acceptable(IProject project) {
-		List<String> gradle = BuildGradleUtil.loadText(project);
-		String version = BuildGradleUtil.getAsakusaFrameworkVersion(gradle);
+		Properties gradle = GradlePrefsUtil.loadText(project);
+		String version = GradlePrefsUtil.getAsakusaFrameworkVersion(gradle);
 		if (version == null) {
 			return false;
 		}
@@ -39,7 +40,7 @@ public class AsakusaFramework052GradleConfigration extends AsakusafwConfiguratio
 
 	@Override
 	public String getDefaultBuildPropertiesPath() {
-		return "build.gradle";
+		return ".settings/com.asakusafw.asakusafw.prefs";
 	}
 
 	@Override
@@ -49,7 +50,7 @@ public class AsakusaFramework052GradleConfigration extends AsakusafwConfiguratio
 
 	@Override
 	public AsakusafwProperties getAsakusafwProperties(IProject project, String propertyFilePath) throws IOException {
-		List<String> gradle = BuildGradleUtil.loadText(project, propertyFilePath);
-		return new EasyBuildGradle(gradle);
+		Properties gradle = GradlePrefsUtil.loadText(project, propertyFilePath);
+		return new GradlePrefs(gradle);
 	}
 }
