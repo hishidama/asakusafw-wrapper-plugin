@@ -5,6 +5,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.extension.AsakusafwConfiguration;
@@ -293,12 +294,36 @@ public class ParserClassUtil {
 	}
 
 	public static AsakusafwConfiguration getDefaultConfiguration(IProject project) {
+		List<AsakusafwConfiguration> list = new ArrayList<AsakusafwConfiguration>();
+
 		for (AsakusafwConfiguration c : Activator.getExtensionLoader().getConfigurations()) {
 			if (c.acceptable(project)) {
-				return c;
+				list.add(c);
 			}
 		}
-		return null;
+		if (list.isEmpty()) {
+			return null;
+		}
+		if (list.size() == 1) {
+			return list.get(0);
+		}
+
+		Collections.sort(list, new Comparator<AsakusafwConfiguration>() {
+			@Override
+			public int compare(AsakusafwConfiguration o1, AsakusafwConfiguration o2) {
+				String min1 = o1.getVersionMin();
+				String min2 = o2.getVersionMin();
+				int c = AsakusafwConfiguration.compareVersion(min1, min2);
+				if (c != 0) {
+					return c;
+				}
+
+				String max1 = o1.getVersionMax();
+				String max2 = o2.getVersionMax();
+				return AsakusafwConfiguration.compareVersion(max1, max2);
+			}
+		});
+		return list.get(list.size() - 1);
 	}
 
 	public static List<Library> getDefaultLibraries(IProject project) {
