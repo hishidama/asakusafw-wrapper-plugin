@@ -63,5 +63,13 @@
             name="Open Operator"
             targetId="org.eclipse.jdt.ui.javaCode">
       </hyperlinkDetector>
+      <hyperlinkDetector
+            activate="true"
+            class="jp.hishidama.eclipse_plugin.asakusafw_wrapper.jdt.hyperlink.OpenDeclaredMasterSelectionHyperlinkDetector"
+            description="Open MasterSelection"
+            id="jp.hishidama.asakusafwWrapper.hyperlinkDetector.jdt.open-MasterSelection"
+            name="Open MasterSelection"
+            targetId="org.eclipse.jdt.ui.javaCode">
+      </hyperlinkDetector>
    </extension>
 </plugin>
