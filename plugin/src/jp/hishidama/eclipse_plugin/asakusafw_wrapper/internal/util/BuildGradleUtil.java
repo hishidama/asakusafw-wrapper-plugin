@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.LogUtil;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -43,17 +45,17 @@ public class BuildGradleUtil {
 			} catch (UnsupportedEncodingException e) {
 				throw new RuntimeException(e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				LogUtil.logWarn(BuildGradleUtil.class.getSimpleName(), e);
 				return list;
 			} finally {
 				try {
 					is.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					LogUtil.logWarn(BuildGradleUtil.class.getSimpleName(), e);
 				}
 			}
 		} catch (CoreException e) {
-			e.printStackTrace();
+			LogUtil.logWarn(BuildGradleUtil.class.getSimpleName(), e);
 			return null;
 		}
 	}

@@ -8,6 +8,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.Set;
 
+import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.LogUtil;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -37,17 +39,17 @@ public class PomXmlUtil {
 			} catch (UnsupportedEncodingException e) {
 				throw new RuntimeException(e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				LogUtil.logWarn(PomXmlUtil.class.getSimpleName(), e);
 				return sb.toString();
 			} finally {
 				try {
 					is.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					LogUtil.logWarn(PomXmlUtil.class.getSimpleName(), e);
 				}
 			}
 		} catch (CoreException e) {
-			e.printStackTrace();
+			LogUtil.logWarn(PomXmlUtil.class.getSimpleName(), e);
 			return "";
 		}
 	}

@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
+import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.LogUtil;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -33,17 +35,17 @@ public class GradlePrefsUtil {
 			} catch (UnsupportedEncodingException e) {
 				throw new RuntimeException(e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				LogUtil.logWarn(GradlePrefsUtil.class.getSimpleName(), e);
 				return properties;
 			} finally {
 				try {
 					is.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					LogUtil.logWarn(GradlePrefsUtil.class.getSimpleName(), e);
 				}
 			}
 		} catch (CoreException e) {
-			e.printStackTrace();
+			LogUtil.logWarn(GradlePrefsUtil.class.getSimpleName(), e);
 			return null;
 		}
 	}

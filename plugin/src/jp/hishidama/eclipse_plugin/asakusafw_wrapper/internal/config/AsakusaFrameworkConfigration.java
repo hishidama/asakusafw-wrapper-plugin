@@ -11,6 +11,7 @@ import java.util.Properties;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.config.AsakusafwProperties;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.extension.AsakusafwConfiguration;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.Activator;
+import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.LogUtil;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.util.PomXmlUtil;
 
 import org.eclipse.core.resources.IFile;
@@ -51,7 +52,7 @@ public abstract class AsakusaFrameworkConfigration extends AsakusafwConfiguratio
 		try {
 			file = project.getFile(fname);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.logWarn("loadProperties()", e);
 		}
 		if (file == null || !file.exists()) {
 			IStatus status = new Status(IStatus.WARNING, Activator.PLUGIN_ID, MessageFormat.format(
@@ -87,13 +88,13 @@ public abstract class AsakusaFrameworkConfigration extends AsakusafwConfiguratio
 				try {
 					reader.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					LogUtil.logWarn(AsakusaFrameworkConfigration.class.getSimpleName(), e);
 				}
 			} else if (is != null) {
 				try {
 					is.close();
 				} catch (IOException e) {
-					e.printStackTrace();
+					LogUtil.logWarn(AsakusaFrameworkConfigration.class.getSimpleName(), e);
 				}
 			}
 		}

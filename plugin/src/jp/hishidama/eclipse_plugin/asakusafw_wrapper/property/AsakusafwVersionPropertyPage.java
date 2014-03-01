@@ -4,6 +4,7 @@ import java.util.List;
 
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.extension.AsakusafwConfiguration;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.Activator;
+import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.LogUtil;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.util.ParserClassUtil;
 import jp.hishidama.eclipse_plugin.util.StringUtil;
 import jp.hishidama.eclipse_plugin.util.SwtCheckedTableUtil;
@@ -77,7 +78,7 @@ public class AsakusafwVersionPropertyPage extends PropertyPage {
 			try {
 				name = c.getConfigurationName();
 			} catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.logWarn(getClass().getSimpleName(), e);
 			}
 			if (name == null) {
 				continue;

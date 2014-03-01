@@ -11,6 +11,7 @@ import java.util.List;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.extension.AsakusafwConfiguration;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.extension.AsakusafwConfiguration.Library;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.Activator;
+import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.LogUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -44,7 +45,7 @@ public class ParserClassUtil {
 						list.add(url);
 					}
 				} catch (MalformedURLException e) {
-					e.printStackTrace();
+					LogUtil.logWarn(ParserClassUtil.class.getSimpleName(), e);
 				}
 			}
 		}
@@ -72,7 +73,7 @@ public class ParserClassUtil {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.logWarn("toURL()", e);
 		}
 		try {
 			IFile file = project.getParent().getFile(path);
@@ -83,7 +84,7 @@ public class ParserClassUtil {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.logWarn("toURL()", e);
 		}
 		return null;
 	}
@@ -93,7 +94,7 @@ public class ParserClassUtil {
 			IClasspathEntry[] cp = project.getRawClasspath();
 			getClassPath(list, project, cp);
 		} catch (JavaModelException e) {
-			e.printStackTrace();
+			LogUtil.logWarn("getProjectClassPath()", e);
 		}
 	}
 
@@ -121,7 +122,7 @@ public class ParserClassUtil {
 					break;
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.logWarn("getClassPath()", e);
 			}
 			if (url != null) {
 				list.add(url);
@@ -184,7 +185,7 @@ public class ParserClassUtil {
 					try {
 						cname = c.getConfigurationName();
 					} catch (Exception e) {
-						e.printStackTrace();
+						LogUtil.logError("initializeProjectParser()", e);
 					}
 				}
 				if (cname == null) {
@@ -202,12 +203,12 @@ public class ParserClassUtil {
 			try {
 				bpath = c.getDefaultBuildPropertiesPath();
 			} catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.logWarn("initializeProjectParser()", e);
 			}
 			try {
 				libs = c.getDefaultLibraries(project);
 			} catch (Exception e) {
-				e.printStackTrace();
+				LogUtil.logWarn("initializeProjectParser()", e);
 			}
 		}
 		if (bpath == null) {
@@ -342,7 +343,7 @@ public class ParserClassUtil {
 			}
 			return list;
 		} catch (Exception e) {
-			e.printStackTrace();
+			LogUtil.logError("getDefaultLibraries()", e);
 			return Collections.emptyList();
 		}
 	}

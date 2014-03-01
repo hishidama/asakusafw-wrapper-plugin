@@ -74,7 +74,6 @@ public class DMDLErrorCheckTask implements IRunnableWithProgress {
 		} catch (InterruptedException e) {
 			throw e;
 		} catch (Exception e) {
-			e.printStackTrace();
 			throw new InvocationTargetException(e);
 		} finally {
 			monitor.done();
