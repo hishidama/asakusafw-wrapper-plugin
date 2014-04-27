@@ -33,10 +33,14 @@ public class PorterUtil {
 	}
 
 	public static boolean isPorter(IType type) {
+		return getPorterInterfaceName(type) != null;
+	}
+
+	public static String getPorterInterfaceName(IType type) {
 		Set<String> set = new HashSet<String>(2);
 		set.add(IMPORTER_NAME);
 		set.add(EXPORTER_NAME);
-		return TypeUtil.isImplements(type, set);
+		return TypeUtil.findImplements(type, set);
 	}
 
 	public static String getModelClassName(IJavaProject javaProject, String porterClassName) {
