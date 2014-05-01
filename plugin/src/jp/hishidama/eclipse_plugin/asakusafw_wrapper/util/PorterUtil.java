@@ -6,8 +6,21 @@ import java.util.Set;
 import jp.hishidama.eclipse_plugin.jdt.util.ReflectionUtil;
 import jp.hishidama.eclipse_plugin.jdt.util.TypeUtil;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.ReturnStatement;
+import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.jdt.core.dom.TypeLiteral;
 
 /**
  * Impoter/Expoterユーティリティー.
@@ -44,6 +57,14 @@ public class PorterUtil {
 	}
 
 	public static String getModelClassName(IJavaProject javaProject, String porterClassName) {
+		String name = getModelClassNameAst(javaProject, porterClassName);
+		if (name != null) {
+			return name;
+		}
+		return getModelClassNameReflection(javaProject, porterClassName);
+	}
+
+	private static String getModelClassNameReflection(IJavaProject javaProject, String porterClassName) {
 		try {
 			Class<?> clazz = ReflectionUtil.loadClass(javaProject, porterClassName);
 			Object object = clazz.newInstance();
@@ -51,6 +72,78 @@ public class PorterUtil {
 			return modelType.getName();
 		} catch (Exception e) {
 			return null;
+		}
+	}
+
+	private static String getModelClassNameAst(IJavaProject javaProject, String porterClassName) {
+		try {
+			IType type = javaProject.findType(porterClassName);
+			return getModelClassName(type);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	private static String getModelClassName(IType type) throws JavaModelException {
+		if (type == null) {
+			return null;
+		}
+
+		for (IMethod method : type.getMethods()) {
+			if (method.getElementName().equals("getModelType")) {
+				return getModelClassName(method);
+			}
+		}
+
+		String superName = type.getSuperclassName();
+		IType superType = TypeUtil.resolveType(superName, type);
+		return getModelClassName(superType);
+	}
+
+	private static String getModelClassName(IMethod method) {
+		ASTParser parser = ASTParser.newParser(AST.JLS4);
+		parser.setSource(method.getCompilationUnit());
+		try {
+			ISourceRange range = method.getSourceRange();
+			parser.setSourceRange(range.getOffset(), range.getLength());
+		} catch (JavaModelException e) {
+			// fall through
+		}
+		ASTNode node = parser.createAST(new NullProgressMonitor());
+		FindModelTypeVisitor visitor = new FindModelTypeVisitor();
+		node.accept(visitor);
+		String simpleName = visitor.getModelTypeName();
+		if (simpleName == null) {
+			return null;
+		}
+		return TypeUtil.resolveTypeName(simpleName, method.getDeclaringType());
+	}
+
+	private static class FindModelTypeVisitor extends ASTVisitor {
+		private String typeName;
+
+		@Override
+		public boolean visit(MethodDeclaration node) {
+			String name = node.getName().getIdentifier();
+			if (name.equals("getModelType")) {
+				return true;
+			}
+			return false;
+		}
+
+		@Override
+		public boolean visit(ReturnStatement node) {
+			Expression expression = node.getExpression();
+			if (expression instanceof TypeLiteral) {
+				TypeLiteral literal = (TypeLiteral) expression;
+				Type type = literal.getType();
+				this.typeName = type.toString();
+			}
+			return false;
+		}
+
+		public String getModelTypeName() {
+			return typeName;
 		}
 	}
 }
