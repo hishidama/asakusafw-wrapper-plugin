@@ -72,4 +72,32 @@
             targetId="org.eclipse.jdt.ui.javaCode">
       </hyperlinkDetector>
    </extension>
+   <extension
+         id="jdt.assist.masterSelectionString"
+         name="MasterSelection string assist"
+         point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
+      <javaCompletionProposalComputer
+            activate="true"
+            categoryId="jp.hishidama.xtext.dmdl_editor.ui.jdt.assist.category"
+            class="jp.hishidama.eclipse_plugin.asakusafw_wrapper.jdt.assist.MasterSelectionStringCompletionProposalComputer"
+            needsSortingAfterFiltering="false">
+         <partition
+               type="__java_string">
+         </partition>
+      </javaCompletionProposalComputer>
+   </extension>
+   <extension
+         id="jdt.assist.masterSelection"
+         name="MasterSelection assist"
+         point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
+      <javaCompletionProposalComputer
+            activate="true"
+            categoryId="jp.hishidama.xtext.dmdl_editor.ui.jdt.assist.category"
+            class="jp.hishidama.eclipse_plugin.asakusafw_wrapper.jdt.assist.MasterSelectionCompletionProposalComputer"
+            needsSortingAfterFiltering="false">
+         <partition
+               type="__dftl_partition_content_type">
+         </partition>
+      </javaCompletionProposalComputer>
+   </extension>
 </plugin>

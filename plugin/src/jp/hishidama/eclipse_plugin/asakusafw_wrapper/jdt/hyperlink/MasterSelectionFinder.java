@@ -16,12 +16,18 @@ public class MasterSelectionFinder extends ASTVisitor {
 	private ICompilationUnit unit;
 	private int offset;
 
+	private String memberName;
 	private IRegion region;
 	private String selectionName;
 
 	public MasterSelectionFinder(ICompilationUnit unit, int offset) {
 		this.unit = unit;
 		this.offset = offset;
+	}
+
+	public String getMemberName() {
+		visit();
+		return memberName;
 	}
 
 	public String getMasterSelectionName() {
@@ -66,7 +72,11 @@ public class MasterSelectionFinder extends ASTVisitor {
 	@Override
 	public boolean visit(MemberValuePair node) {
 		String name = node.getName().getIdentifier();
-		return "selection".equals(name);
+		if ("selection".equals(name)) {
+			this.memberName = name;
+			return true;
+		}
+		return false;
 	}
 
 	@Override
