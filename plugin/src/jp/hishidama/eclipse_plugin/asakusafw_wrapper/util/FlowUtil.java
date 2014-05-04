@@ -20,6 +20,7 @@ import org.eclipse.jdt.core.JavaModelException;
  */
 public class FlowUtil {
 	public static final String JOBFLOW_NAME = "com.asakusafw.vocabulary.flow.JobFlow";
+	public static final String FLOWPART_NAME = "com.asakusafw.vocabulary.flow.FlowPart";
 	public static final String FLOW_DESCRIPTION_NAME = "com.asakusafw.vocabulary.flow.FlowDescription";
 	public static final String IMPORT_NAME = "com.asakusafw.vocabulary.flow.Import";
 	public static final String EXPORT_NAME = "com.asakusafw.vocabulary.flow.Export";
@@ -28,6 +29,11 @@ public class FlowUtil {
 
 	public static boolean isJobFlow(IType type) {
 		return AnnotationUtil.getAnnotation(type, JOBFLOW_NAME) != null
+				&& TypeUtil.isExtends(type, FLOW_DESCRIPTION_NAME);
+	}
+
+	public static boolean isFlowPart(IType type) {
+		return AnnotationUtil.getAnnotation(type, FLOWPART_NAME) != null
 				&& TypeUtil.isExtends(type, FLOW_DESCRIPTION_NAME);
 	}
 
