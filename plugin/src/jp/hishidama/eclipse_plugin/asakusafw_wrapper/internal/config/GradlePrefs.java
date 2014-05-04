@@ -44,6 +44,11 @@ public class GradlePrefs extends AsakusafwProperties {
 		return getProperty("com.asaksuafw.asakusafw.dmdl.dmdlEncoding");
 	}
 
+	@Override
+	public String getTestDataSheetOutput() {
+		return getProperty("com.asaksuafw.asakusafw.testtools.testDataSheetDirectory");
+	}
+
 	private String getProperty(String key) {
 		return properties.getProperty(key);
 	}

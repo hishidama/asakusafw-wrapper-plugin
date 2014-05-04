@@ -36,9 +36,17 @@ public abstract class AsakusafwProperties {
 	public abstract String getModelgenPackage();
 
 	/**
-	 * DMDLファイルのエンコーディング
+	 * DMDLファイルのエンコーディング.
 	 * 
 	 * @return エンコーディング（null可）
 	 */
 	public abstract String getDmdlEncoding();
+
+	/**
+	 * テストデータExcelシートの生成先ディレクトリー.
+	 * 
+	 * @return ディレクトリーのパス
+	 * @since 2014.05.04
+	 */
+	public abstract String getTestDataSheetOutput();
 }

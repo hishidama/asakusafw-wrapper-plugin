@@ -37,6 +37,11 @@ public class BuildProperties extends AsakusafwProperties {
 		return getProperty("asakusa.dmdl.encoding");
 	}
 
+	@Override
+	public String getTestDataSheetOutput() {
+		return getProperty("asakusa.testdatasheet.output");
+	}
+
 	private String getProperty(String key) {
 		if (properties == null) {
 			return null;

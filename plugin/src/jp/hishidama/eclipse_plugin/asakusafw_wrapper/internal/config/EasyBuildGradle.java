@@ -52,6 +52,11 @@ public class EasyBuildGradle extends AsakusafwProperties {
 		return "UTF-8";
 	}
 
+	@Override
+	public String getTestDataSheetOutput() {
+		return "build/excel";
+	}
+
 	private String getProperty(String key) {
 		return properties.get(key);
 	}
