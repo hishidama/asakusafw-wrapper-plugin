@@ -6,7 +6,6 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
@@ -59,16 +58,6 @@ public class ExcelFinder extends ASTVisitor {
 		int offset = node.getStartPosition();
 		int length = node.getLength();
 		return offset <= this.offset && this.offset <= offset + length;
-	}
-
-	@Override
-	public boolean visit(MethodInvocation node) {
-		String name = node.getName().getIdentifier();
-		if ("prepare".equals(name) || "verify".equals(name)) {
-			this.methodName = name;
-			return true;
-		}
-		return false;
 	}
 
 	@Override
