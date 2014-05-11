@@ -2,7 +2,9 @@ package jp.hishidama.eclipse_plugin.asakusafw_wrapper.util;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import jp.hishidama.eclipse_plugin.jdt.util.AnnotationUtil;
 import jp.hishidama.eclipse_plugin.jdt.util.TypeUtil;
@@ -26,6 +28,13 @@ public class FlowUtil {
 	public static final String EXPORT_NAME = "com.asakusafw.vocabulary.flow.Export";
 	public static final String IN_NAME = "com.asakusafw.vocabulary.flow.In";
 	public static final String OUT_NAME = "com.asakusafw.vocabulary.flow.Out";
+
+	public static boolean isFlow(IType type) {
+		Set<String> set = new HashSet<String>(2);
+		set.add(JOBFLOW_NAME);
+		set.add(FLOWPART_NAME);
+		return AnnotationUtil.getAnnotation(type, type, set) != null && TypeUtil.isExtends(type, FLOW_DESCRIPTION_NAME);
+	}
 
 	public static boolean isJobFlow(IType type) {
 		return AnnotationUtil.getAnnotation(type, JOBFLOW_NAME) != null
