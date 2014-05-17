@@ -46,6 +46,10 @@ public class FlowUtil {
 				&& TypeUtil.isExtends(type, FLOW_DESCRIPTION_NAME);
 	}
 
+	public static String getJobFlowName(IType type) {
+		return AnnotationUtil.getAnnotationValue(type, JOBFLOW_NAME, "name");
+	}
+
 	public static List<FlowParameter> getFlowParameters(IType type) {
 		IMethod constructor = getConstructor(type);
 		if (constructor == null) {
