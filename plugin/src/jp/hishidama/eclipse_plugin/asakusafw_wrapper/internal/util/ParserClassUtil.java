@@ -1,5 +1,7 @@
 package jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.util;
 
+import static jp.hishidama.eclipse_plugin.util.StringUtil.isEmpty;
+
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -168,12 +170,25 @@ public class ParserClassUtil {
 	}
 
 	public static void initializeProjectParser(IProject project) {
+		IFile file = project.getFile(".classpath");
+		long time = file.getLocalTimeStamp();
+
 		final String key = "ParserClassPath.initialize";
-		{
+		check: {
 			String s = getValue(project, key);
-			if (nonEmpty(s)) {
-				return;
+			if (isEmpty(s)) {
+				break check;
 			}
+
+			try {
+				long cache = Long.parseLong(s);
+				if (cache < time) {
+					break check;
+				}
+			} catch (NumberFormatException e) {
+				break check;
+			}
+			return;
 		}
 
 		AsakusafwConfiguration c = null;
@@ -221,7 +236,7 @@ public class ParserClassUtil {
 		}
 		setLibraries(project, libs);
 
-		setValue(project, key, "initialized");
+		setValue(project, key, Long.toString(time));
 	}
 
 	public static String getValue(IProject project, String key) {
@@ -346,13 +361,5 @@ public class ParserClassUtil {
 			LogUtil.logError("getDefaultLibraries()", e);
 			return Collections.emptyList();
 		}
-	}
-
-	private static boolean nonEmpty(String s) {
-		return s != null && !s.isEmpty();
-	}
-
-	private static boolean isEmpty(String s) {
-		return s == null || s.isEmpty();
 	}
 }

@@ -29,7 +29,9 @@ import org.eclipse.ui.part.FileEditorInput;
 
 public class DMDLErrorCheckTask implements IRunnableWithProgress {
 
-	public static final QualifiedName KEY = new QualifiedName(Activator.PLUGIN_ID, "DMDLErrorCheckTask.parser");
+	public static final QualifiedName PASER_KEY = new QualifiedName(Activator.PLUGIN_ID, "DMDLErrorCheckTask.parser");
+	public static final QualifiedName TIME_KEY = new QualifiedName(Activator.PLUGIN_ID,
+			"DMDLErrorCheckTask.parser.time");
 
 	private IProject project;
 
@@ -48,10 +50,15 @@ public class DMDLErrorCheckTask implements IRunnableWithProgress {
 
 		DmdlParserWrapper wrapper = null;
 		try {
-			wrapper = (DmdlParserWrapper) project.getSessionProperty(KEY);
-			if (wrapper == null) {
+			IFile file = project.getFile(".classpath");
+			long time = file.getLocalTimeStamp();
+			Long cache = (Long) project.getSessionProperty(TIME_KEY);
+
+			wrapper = (DmdlParserWrapper) project.getSessionProperty(PASER_KEY);
+			if (wrapper == null || (cache != null && cache < time)) {
 				wrapper = new DmdlParserWrapper(jproject);
-				project.setSessionProperty(KEY, wrapper);
+				project.setSessionProperty(PASER_KEY, wrapper);
+				project.setSessionProperty(TIME_KEY, time);
 			}
 		} catch (CoreException e) {
 			if (wrapper == null) {
