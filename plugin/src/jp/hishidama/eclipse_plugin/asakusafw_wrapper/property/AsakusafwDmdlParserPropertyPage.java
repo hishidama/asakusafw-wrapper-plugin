@@ -350,7 +350,7 @@ public class AsakusafwDmdlParserPropertyPage extends PropertyPage {
 		ParserClassUtil.setLibraries(project, list);
 
 		try {
-			project.setSessionProperty(DMDLErrorCheckTask.KEY, null);
+			project.setSessionProperty(DMDLErrorCheckTask.PASER_KEY, null);
 		} catch (CoreException e) {
 			LogUtil.log(e.getStatus());
 		}
