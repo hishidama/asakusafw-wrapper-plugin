@@ -84,20 +84,24 @@ public class PorterUtil {
 		}
 	}
 
-	private static String getModelClassName(IType type) throws JavaModelException {
+	public static String getModelClassName(IType type) {
 		if (type == null) {
 			return null;
 		}
 
-		for (IMethod method : type.getMethods()) {
-			if (method.getElementName().equals("getModelType")) {
-				return getModelClassName(method);
+		try {
+			for (IMethod method : type.getMethods()) {
+				if (method.getElementName().equals("getModelType")) {
+					return getModelClassName(method);
+				}
 			}
-		}
 
-		String superName = type.getSuperclassName();
-		IType superType = TypeUtil.resolveType(superName, type);
-		return getModelClassName(superType);
+			String superName = type.getSuperclassName();
+			IType superType = TypeUtil.resolveType(superName, type);
+			return getModelClassName(superType);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 	private static String getModelClassName(IMethod method) {
