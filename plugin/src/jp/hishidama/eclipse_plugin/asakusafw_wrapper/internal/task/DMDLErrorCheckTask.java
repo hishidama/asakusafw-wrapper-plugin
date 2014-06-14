@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.dmdl.DmdlParseErrorInfo;
-import jp.hishidama.eclipse_plugin.asakusafw_wrapper.dmdl.DmdlParserWrapper;
-import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.Activator;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.LogUtil;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.util.DMDLFileUtil;
 
@@ -18,54 +16,16 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.editors.text.FileDocumentProvider;
 import org.eclipse.ui.part.FileEditorInput;
 
-public class DMDLErrorCheckTask implements IRunnableWithProgress {
-
-	public static final QualifiedName PASER_KEY = new QualifiedName(Activator.PLUGIN_ID, "DMDLErrorCheckTask.parser");
-	public static final QualifiedName TIME_KEY = new QualifiedName(Activator.PLUGIN_ID,
-			"DMDLErrorCheckTask.parser.time");
-
-	private IProject project;
-
-	private DmdlParserWrapper wrapper;
+public class DMDLErrorCheckTask extends ParserWrapperTask implements IRunnableWithProgress {
 
 	public DMDLErrorCheckTask(IProject project) {
-		this.project = project;
-		this.wrapper = createWrapper(project);
-	}
-
-	protected DmdlParserWrapper createWrapper(IProject project) {
-		IJavaProject jproject = JavaCore.create(project);
-		if (jproject == null) {
-			return null;
-		}
-
-		DmdlParserWrapper wrapper = null;
-		try {
-			IFile file = project.getFile(".classpath");
-			long time = file.getLocalTimeStamp();
-			Long cache = (Long) project.getSessionProperty(TIME_KEY);
-
-			wrapper = (DmdlParserWrapper) project.getSessionProperty(PASER_KEY);
-			if (wrapper == null || (cache != null && cache < time)) {
-				wrapper = new DmdlParserWrapper(jproject);
-				project.setSessionProperty(PASER_KEY, wrapper);
-				project.setSessionProperty(TIME_KEY, time);
-			}
-		} catch (CoreException e) {
-			if (wrapper == null) {
-				wrapper = new DmdlParserWrapper(jproject);
-			}
-		}
-		return wrapper.isValid() ? wrapper : null;
+		super(project);
 	}
 
 	@Override
@@ -154,12 +114,6 @@ public class DMDLErrorCheckTask implements IRunnableWithProgress {
 			marker.setAttribute(IMarker.TRANSIENT, false);
 		} catch (Exception e) {
 			LogUtil.logWarn("DMDLErrorCheckTask#createErrorMarker() error.", e);
-		}
-	}
-
-	protected void cancelCheck(IProgressMonitor monitor) throws InterruptedException {
-		if (monitor.isCanceled()) {
-			throw new InterruptedException();
 		}
 	}
 }

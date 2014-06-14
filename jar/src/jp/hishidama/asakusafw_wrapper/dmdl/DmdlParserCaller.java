@@ -5,9 +5,11 @@ import java.io.Reader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.ServiceLoader;
 
 import jp.hishidama.asakusafw_wrapper.dmdl.DmdlSourceUri.Info;
+import jp.hishidama.asakusafw_wrapper.dmdl.excel.TestSheetHelper;
 
 import com.asakusafw.dmdl.Diagnostic;
 import com.asakusafw.dmdl.Region;
@@ -17,6 +19,7 @@ import com.asakusafw.dmdl.model.AstModelDefinition;
 import com.asakusafw.dmdl.model.AstScript;
 import com.asakusafw.dmdl.parser.DmdlParser;
 import com.asakusafw.dmdl.parser.DmdlSyntaxException;
+import com.asakusafw.dmdl.semantics.DmdlSemantics;
 import com.asakusafw.dmdl.source.DmdlSourceRepository;
 import com.asakusafw.dmdl.source.DmdlSourceRepository.Cursor;
 import com.asakusafw.dmdl.spi.AttributeDriver;
@@ -30,7 +33,7 @@ public class DmdlParserCaller {
 		return result;
 	}
 
-	protected void analyze(List<Object[]> files, List<Object[]> result) throws IOException {
+	public DmdlSemantics analyze(List<Object[]> files, List<Object[]> result) throws IOException {
 		List<Info> list = new ArrayList<Info>(files.size());
 		for (Object[] arr : files) {
 			list.add(new Info((URI) arr[0], (String) arr[1]));
@@ -38,7 +41,7 @@ public class DmdlParserCaller {
 		DmdlSourceRepository repository = new DmdlSourceUri(list);
 		DmdlAnalyzer analyzer = parse(repository, result);
 		try {
-			analyzer.resolve();
+			return analyzer.resolve();
 		} catch (DmdlSemanticException e) {
 			for (Diagnostic diagnostic : e.getDiagnostics()) {
 				int level;
@@ -55,6 +58,7 @@ public class DmdlParserCaller {
 				}
 				result.add(createResult(level, diagnostic.message, diagnostic.region));
 			}
+			return null;
 		}
 	}
 
@@ -93,5 +97,9 @@ public class DmdlParserCaller {
 		}
 		return new Object[] { region.sourceFile, level, message, region.beginLine, region.beginColumn, region.endLine,
 				region.endColumn };
+	}
+
+	public void copySheets(Map<String, List<Object[]>> map) throws Exception {
+		new TestSheetHelper().copySheets(map);
 	}
 }
