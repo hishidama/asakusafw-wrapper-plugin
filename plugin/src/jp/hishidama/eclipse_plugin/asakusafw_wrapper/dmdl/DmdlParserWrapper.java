@@ -15,6 +15,7 @@ import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.util.ParserClassUt
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
@@ -154,39 +155,28 @@ public class DmdlParserWrapper {
 		return sb.toString();
 	}
 
-	public void copySheets(Map<String, List<Object[]>> map) {
+	@SuppressWarnings("unchecked")
+	public Map<String, Object[]> getRuleItem() throws CoreException {
 		String taskName = "DMDLパーサーのロード中";
 		try {
 			Class<?> c = parserLoader.loadClass(CALLER_CLASS);
 			taskName = "DMDLパーサーの準備中";
 			Object caller = c.newInstance();
 			taskName = "DMDLパーサーのメソッド準備中";
-			Method method = c.getMethod("copySheets", Map.class);
+			Method method = c.getMethod("getRuleItem");
 			taskName = "DMDLパーサーの実行中";
-			method.invoke(caller, map);
-		} catch (final Throwable e) {
+			return (Map<String, Object[]>) method.invoke(caller);
+		} catch (Throwable e) {
 			{
-				String message = MessageFormat.format("DmdlParser#fillRuleDataValidation() error. classpath={0}",
+				String message = MessageFormat.format("DmdlParser#getRuleItem() error. classpath={0}",
 						toString(parserClassList));
 				LogUtil.logWarn(message, e);
 			}
-			final String taskName0 = taskName;
-			Display.getDefault().syncExec(new Runnable() {
-				@Override
-				public void run() {
-					Throwable t = e;
-					while (t.getCause() != null) {
-						t = t.getCause();
-					}
-					IStatus status = LogUtil.warnStatus(MessageFormat.format(
-							"DmdlParser#parse() error.\nexception={0}\nmessage={1}", t.getClass().getName(),
-							t.getMessage()), t);
-					String message = MessageFormat
-							.format("{0}にエラーが発生しました。\nDMDLパーサーに必要なライブラリーが指定されていない可能性があります。\nプロパティーページでAsakusa FrameworkおよびDmdlParserの設定を確認してください。",
-									taskName0);
-					ErrorDialog.openError(null, "error", message, status);
-				}
-			});
+			String message = MessageFormat
+					.format("{0}にエラーが発生しました。\nDMDLパーサーに必要なライブラリーが指定されていない可能性があります。\nプロパティーページでAsakusa FrameworkおよびDmdlParserの設定を確認してください。",
+							taskName);
+			IStatus status = LogUtil.warnStatus(message, e);
+			throw new CoreException(status);
 		}
 	}
 }

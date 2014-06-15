@@ -1,7 +1,6 @@
 package jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.task;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
@@ -10,18 +9,17 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 
 public class TestSheetHelperTask extends ParserWrapperTask implements IRunnableWithProgress {
 
-	private Map<String, List<Object[]>> map;
+	private Map<String, Object[]> map;
 
-	public TestSheetHelperTask(IProject project, Map<String, List<Object[]>> map) {
+	public TestSheetHelperTask(IProject project) {
 		super(project);
-		this.map = map;
 	}
 
 	@Override
 	public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 		try {
 			cancelCheck(monitor);
-			copySheets(monitor, map);
+			getRuleItem(monitor);
 		} catch (InterruptedException e) {
 			throw e;
 		} catch (Exception e) {
@@ -31,16 +29,20 @@ public class TestSheetHelperTask extends ParserWrapperTask implements IRunnableW
 		}
 	}
 
-	public void copySheets(IProgressMonitor monitor, Map<String, List<Object[]>> map) throws Exception {
-		monitor.beginTask("copy sheet", 100);
+	private void getRuleItem(IProgressMonitor monitor) throws Exception {
+		monitor.beginTask("get rule validation", 100);
 		try {
 			cancelCheck(monitor);
 			if (wrapper == null) {
-				return;
+				throw new Exception("DmdlParserWrapperの作成に失敗しました。");
 			}
-			wrapper.copySheets(map);
+			this.map = wrapper.getRuleItem();
 		} finally {
 			monitor.done();
 		}
+	}
+
+	public Map<String, Object[]> getRuleItem() {
+		return map;
 	}
 }

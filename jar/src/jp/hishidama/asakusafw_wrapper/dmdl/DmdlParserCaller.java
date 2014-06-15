@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.ServiceLoader;
 
 import jp.hishidama.asakusafw_wrapper.dmdl.DmdlSourceUri.Info;
-import jp.hishidama.asakusafw_wrapper.dmdl.excel.TestSheetHelper;
 
 import com.asakusafw.dmdl.Diagnostic;
 import com.asakusafw.dmdl.Region;
@@ -99,7 +98,7 @@ public class DmdlParserCaller {
 				region.endColumn };
 	}
 
-	public void copySheets(Map<String, List<Object[]>> map) throws Exception {
-		new TestSheetHelper().copySheets(map);
+	public Map<String, Object[]> getRuleItem() throws Exception {
+		return new TestSheetHelper().getRuleItem();
 	}
 }
