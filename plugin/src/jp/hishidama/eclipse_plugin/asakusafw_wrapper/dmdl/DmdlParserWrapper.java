@@ -7,6 +7,7 @@ import java.net.URLClassLoader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.Activator;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.LogUtil;
@@ -14,6 +15,7 @@ import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.util.ParserClassUt
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
@@ -151,5 +153,30 @@ public class DmdlParserWrapper {
 			sb.append(obj);
 		}
 		return sb.toString();
+	}
+
+	@SuppressWarnings("unchecked")
+	public Map<String, Object[]> getRuleItem() throws CoreException {
+		String taskName = "DMDLパーサーのロード中";
+		try {
+			Class<?> c = parserLoader.loadClass(CALLER_CLASS);
+			taskName = "DMDLパーサーの準備中";
+			Object caller = c.newInstance();
+			taskName = "DMDLパーサーのメソッド準備中";
+			Method method = c.getMethod("getRuleItem");
+			taskName = "DMDLパーサーの実行中";
+			return (Map<String, Object[]>) method.invoke(caller);
+		} catch (Throwable e) {
+			{
+				String message = MessageFormat.format("DmdlParser#getRuleItem() error. classpath={0}",
+						toString(parserClassList));
+				LogUtil.logWarn(message, e);
+			}
+			String message = MessageFormat
+					.format("{0}にエラーが発生しました。\nDMDLパーサーに必要なライブラリーが指定されていない可能性があります。\nプロパティーページでAsakusa FrameworkおよびDmdlParserの設定を確認してください。",
+							taskName);
+			IStatus status = LogUtil.warnStatus(message, e);
+			throw new CoreException(status);
+		}
 	}
 }

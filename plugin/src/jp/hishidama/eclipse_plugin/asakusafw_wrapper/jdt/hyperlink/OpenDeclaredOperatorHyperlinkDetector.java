@@ -43,14 +43,23 @@ public class OpenDeclaredOperatorHyperlinkDetector extends JdtHyperlinkDetector 
 		if (operator == null) {
 			return null;
 		}
+		IMethod constructor = null;
 		try {
 			for (IMethod method : operator.getMethods()) {
 				if (method.getElementName().equals(name)) {
 					return new IHyperlink[] { new DeclaredOperatorHyperlink(method, word) };
 				}
+				if (method.isConstructor()) {
+					if (constructor == null) {
+						constructor = method;
+					}
+				}
 			}
 		} catch (JavaModelException e) {
 			// fall through
+		}
+		if (constructor != null) {
+			return new IHyperlink[] { new DeclaredOperatorHyperlink(constructor, word) };
 		}
 		return new IHyperlink[] { new DeclaredOperatorHyperlink(operator, word) };
 	}
