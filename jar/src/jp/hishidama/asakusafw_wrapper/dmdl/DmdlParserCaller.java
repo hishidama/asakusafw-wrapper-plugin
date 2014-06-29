@@ -5,10 +5,10 @@ import java.io.Reader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.ServiceLoader;
 
 import jp.hishidama.asakusafw_wrapper.dmdl.DmdlSourceUri.Info;
+import jp.hishidama.asakusafw_wrapper.dmdl.excel.TestSheetGenerator;
 
 import com.asakusafw.dmdl.Diagnostic;
 import com.asakusafw.dmdl.Region;
@@ -98,7 +98,14 @@ public class DmdlParserCaller {
 				region.endColumn };
 	}
 
-	public Map<String, Object[]> getRuleItem() throws Exception {
-		return new TestSheetHelper().getRuleItem();
+	public void generateTestSheet(String version, List<Object[]> files, List<String[]> names) throws Exception {
+		List<Object[]> result = new ArrayList<Object[]>();
+		DmdlSemantics dmdlSemantics = analyze(files, result);
+
+		String className = String.format("%s%s", TestSheetGenerator.class.getName(), version);
+		@SuppressWarnings("unchecked")
+		Class<? extends TestSheetGenerator> clazz = (Class<? extends TestSheetGenerator>) Class.forName(className);
+		TestSheetGenerator generator = clazz.newInstance();
+		generator.execute(dmdlSemantics, names);
 	}
 }
