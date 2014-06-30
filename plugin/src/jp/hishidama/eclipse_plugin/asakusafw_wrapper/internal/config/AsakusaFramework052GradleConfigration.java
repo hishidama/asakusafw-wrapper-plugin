@@ -28,13 +28,10 @@ public class AsakusaFramework052GradleConfigration extends AsakusafwConfiguratio
 	}
 
 	@Override
-	public boolean acceptable(IProject project) {
+	public String getCurrentVersion(IProject project) {
 		List<String> gradle = BuildGradleUtil.loadText(project);
 		String version = BuildGradleUtil.getAsakusaFrameworkVersion(gradle);
-		if (version == null) {
-			return false;
-		}
-		return containsVersion(version, getVersionMin(), getVersionMax());
+		return version;
 	}
 
 	@Override

@@ -38,13 +38,29 @@ public abstract class AsakusafwConfiguration {
 	public abstract String getVersionMax();
 
 	/**
+	 * 現在のバージョン.
+	 * 
+	 * @param project
+	 *            プロジェクト
+	 * @return バージョン
+	 * @since 2014.06.29
+	 */
+	public abstract String getCurrentVersion(IProject project);
+
+	/**
 	 * 該当プロジェクトを受け付けられるかどうか.
 	 * 
 	 * @param project
 	 *            プロジェクト
 	 * @return true：受け付けられる
 	 */
-	public abstract boolean acceptable(IProject project);
+	public boolean acceptable(IProject project) {
+		String version = getCurrentVersion(project);
+		if (version == null) {
+			return false;
+		}
+		return containsVersion(version, getVersionMin(), getVersionMax());
+	}
 
 	/**
 	 * バージョン確認.

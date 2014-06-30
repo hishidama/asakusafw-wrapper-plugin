@@ -7,11 +7,12 @@ import java.net.URLClassLoader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
+import jp.hishidama.eclipse_plugin.asakusafw_wrapper.extension.AsakusafwConfiguration;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.Activator;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.LogUtil;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.util.ParserClassUtil;
+import jp.hishidama.eclipse_plugin.asakusafw_wrapper.util.TestSheetUtil.SheetInfo;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -80,15 +81,8 @@ public class DmdlParserWrapper {
 	}
 
 	public List<DmdlParseErrorInfo> parse(List<IFile> ifiles) {
-		List<Object[]> files = new ArrayList<Object[]>(ifiles.size());
-		for (IFile f : ifiles) {
-			try {
-				Object[] arr = { f.getLocationURI(), f.getCharset() };
-				files.add(arr);
-			} catch (Exception e) {
-				LogUtil.logWarn(MessageFormat.format("DmdlParser#parse({0}) error.", f), e);
-			}
-		}
+		List<Object[]> files = convertFiles(ifiles);
+
 		String taskName = "DMDLパーサーのロード中";
 		try {
 			Class<?> c = parserLoader.loadClass(CALLER_CLASS);
@@ -155,20 +149,29 @@ public class DmdlParserWrapper {
 		return sb.toString();
 	}
 
-	@SuppressWarnings("unchecked")
-	public Map<String, Object[]> getRuleItem() throws CoreException {
+	public void generateTestSheet(String asakusaFwVersion, List<IFile> ifiles, List<SheetInfo> sheetInfoList)
+			throws CoreException {
+		String version = convertTestSheetGeneratorVersion(asakusaFwVersion);
+		List<Object[]> files = convertFiles(ifiles);
+
+		List<String[]> names = new ArrayList<String[]>(sheetInfoList.size());
+		for (SheetInfo info : sheetInfoList) {
+			String[] name = { info.srcModelName, info.srcSheetName, info.dstBookName, info.dstSheetName };
+			names.add(name);
+		}
+
 		String taskName = "DMDLパーサーのロード中";
 		try {
 			Class<?> c = parserLoader.loadClass(CALLER_CLASS);
 			taskName = "DMDLパーサーの準備中";
 			Object caller = c.newInstance();
-			taskName = "DMDLパーサーのメソッド準備中";
-			Method method = c.getMethod("getRuleItem");
-			taskName = "DMDLパーサーの実行中";
-			return (Map<String, Object[]>) method.invoke(caller);
+			taskName = "テストシート作成のメソッド準備中";
+			Method method = c.getMethod("generateTestSheet", String.class, List.class, List.class);
+			taskName = "テストシートの作成中";
+			method.invoke(caller, version, files, names);
 		} catch (Throwable e) {
 			{
-				String message = MessageFormat.format("DmdlParser#getRuleItem() error. classpath={0}",
+				String message = MessageFormat.format("DmdlParser#generateTestSheet() error. classpath={0}",
 						toString(parserClassList));
 				LogUtil.logWarn(message, e);
 			}
@@ -178,5 +181,25 @@ public class DmdlParserWrapper {
 			IStatus status = LogUtil.warnStatus(message, e);
 			throw new CoreException(status);
 		}
+	}
+
+	private List<Object[]> convertFiles(List<IFile> ifiles) {
+		List<Object[]> files = new ArrayList<Object[]>(ifiles.size());
+		for (IFile f : ifiles) {
+			try {
+				Object[] arr = { f.getLocationURI(), f.getCharset() };
+				files.add(arr);
+			} catch (Exception e) {
+				LogUtil.logWarn(MessageFormat.format("DmdlParser#convertFiles({0}) error.", f), e);
+			}
+		}
+		return files;
+	}
+
+	private String convertTestSheetGeneratorVersion(String asakusaFwVersion) {
+		if (AsakusafwConfiguration.compareVersion(asakusaFwVersion, "0.5.3") >= 0) {
+			return "053";
+		}
+		return "02";
 	}
 }

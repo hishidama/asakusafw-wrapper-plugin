@@ -23,13 +23,10 @@ import org.eclipse.core.runtime.Status;
 public abstract class AsakusaFrameworkConfigration extends AsakusafwConfiguration {
 
 	@Override
-	public boolean acceptable(IProject project) {
+	public String getCurrentVersion(IProject project) {
 		String pom = PomXmlUtil.loadText(project);
 		String version = PomXmlUtil.getAsakusaFrameworkVersion(pom);
-		if (version == null) {
-			return false;
-		}
-		return containsVersion(version, getVersionMin(), getVersionMax());
+		return version;
 	}
 
 	@Override
