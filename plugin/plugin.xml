@@ -38,6 +38,11 @@
       </command>
       <command
             categoryId="jp.hishidama.asakusafwWrapper.category"
+            id="jp.hishidama.asakusafwWrapper.command.dmdlAutoErrorCheck"
+            name="DMDL error check">
+      </command>
+      <command
+            categoryId="jp.hishidama.asakusafwWrapper.category"
             id="jp.hishidama.asakusafwWrapper.command.dmdlCompile"
             name="DMDL compile">
       </command>
@@ -47,6 +52,10 @@
       <handler
             class="jp.hishidama.eclipse_plugin.asakusafw_wrapper.handler.DMDLErrorCheckHandler"
             commandId="jp.hishidama.asakusafwWrapper.command.dmdlErrorCheck">
+      </handler>
+      <handler
+            class="jp.hishidama.eclipse_plugin.asakusafw_wrapper.handler.DMDLAutoErrorCheckHandler"
+            commandId="jp.hishidama.asakusafwWrapper.command.dmdlAutoErrorCheck">
       </handler>
       <handler
             class="jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.handler.DMDLCompileHandler"
