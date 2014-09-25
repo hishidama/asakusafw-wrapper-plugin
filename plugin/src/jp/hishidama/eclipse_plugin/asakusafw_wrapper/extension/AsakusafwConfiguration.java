@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.config.AsakusafwProperties;
+import jp.hishidama.eclipse_plugin.asakusafw_wrapper.util.BuildPropertiesUtil;
 
 import org.eclipse.core.resources.IProject;
 
@@ -46,6 +47,23 @@ public abstract class AsakusafwConfiguration {
 	 * @since 2014.06.29
 	 */
 	public abstract String getCurrentVersion(IProject project);
+
+	/**
+	 * 現在のバージョン.
+	 * 
+	 * @param project
+	 *            プロジェクト
+	 * @return バージョン
+	 * @since 2014.08.02
+	 */
+	public static String getAsakusaFwVersion(IProject project) {
+		String asakusaFwVersion = null;
+		AsakusafwConfiguration c = BuildPropertiesUtil.getAsakusafwConfiguration(project);
+		if (c != null) {
+			asakusaFwVersion = c.getCurrentVersion(project);
+		}
+		return asakusaFwVersion;
+	}
 
 	/**
 	 * 該当プロジェクトを受け付けられるかどうか.

@@ -22,7 +22,7 @@ public class DMDLErrorCheckHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		if (!PlatformUI.getWorkbench().saveAllEditors(true)) {
+		if (!prepare(event)) {
 			return null;
 		}
 
@@ -32,8 +32,16 @@ public class DMDLErrorCheckHandler extends AbstractHandler {
 			return null;
 		}
 
-		execute(project, new ProgressMonitorDialog(null));
+		execute(project, createRunnableContext(event));
 		return null;
+	}
+
+	protected boolean prepare(ExecutionEvent event) {
+		return PlatformUI.getWorkbench().saveAllEditors(true);
+	}
+
+	protected IRunnableContext createRunnableContext(ExecutionEvent event) {
+		return new ProgressMonitorDialog(null);
 	}
 
 	public void execute(IProject project, IRunnableContext runner) {
