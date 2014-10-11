@@ -6,31 +6,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import jp.hishidama.asakusafw_wrapper.dmdl.excel.TestSheetGenerator;
-
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import com.asakusafw.dmdl.semantics.ModelDeclaration;
 import com.asakusafw.testdata.generator.excel.SheetBuilder;
 
-public class TestSheetGenerator02 extends TestSheetGenerator {
+public class TestSheetGenerator02 extends AbstractTestSheetGenerator {
 
 	@Override
-	protected void generate(Map<String, List<SheetInfo>> map) throws IOException {
-		for (Entry<String, List<SheetInfo>> entry : map.entrySet()) {
+	protected void generate(Map<String, List<SheetInfo>> bookMap) throws IOException {
+		for (Entry<String, List<SheetInfo>> entry : bookMap.entrySet()) {
+			String fileName = entry.getKey();
+			List<SheetInfo> list = entry.getValue();
+
 			HSSFWorkbook workbook = new HSSFWorkbook();
 
-			for (SheetInfo info : entry.getValue()) {
-				ModelDeclaration model = findModelDeclaration(info.srcModelName);
+			generateIndexSheet(workbook, list);
+
+			for (SheetInfo sheet : list) {
+				ModelDeclaration model = findModelDeclaration(sheet.getSrcModelName());
 				SheetBuilder builder = new SheetBuilder(workbook, model);
-				if ("rule".equals(info.srcSheetName)) {
-					builder.addRule(info.dstSheetName);
+				if ("rule".equals(sheet.getSrcSheetName())) {
+					builder.addRule(sheet.getDstSheetName());
 				} else {
-					builder.addData(info.dstSheetName);
+					builder.addData(sheet.getDstSheetName());
 				}
 			}
 
-			FileOutputStream fos = new FileOutputStream(entry.getKey());
+			FileOutputStream fos = new FileOutputStream(fileName);
 			try {
 				workbook.write(fos);
 			} finally {

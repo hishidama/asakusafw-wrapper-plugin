@@ -14,12 +14,17 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 public class TestSheetGenerateTask extends ParserWrapperTask implements IRunnableWithProgress {
 
 	private String version;
-	private List<SheetInfo> names;
+	private String flowClassName;
+	private String indexSheetName;
+	private List<SheetInfo> sheetList;
 
-	public TestSheetGenerateTask(IProject project, String version, List<SheetInfo> names) {
+	public TestSheetGenerateTask(IProject project, String version, String flowClassName, String indexSheetName,
+			List<SheetInfo> sheetList) {
 		super(project);
 		this.version = version;
-		this.names = names;
+		this.flowClassName = flowClassName;
+		this.indexSheetName = indexSheetName;
+		this.sheetList = sheetList;
 	}
 
 	@Override
@@ -45,6 +50,6 @@ public class TestSheetGenerateTask extends ParserWrapperTask implements IRunnabl
 		if (wrapper == null) {
 			throw new Exception("DmdlParserWrapperの作成に失敗しました。");
 		}
-		wrapper.generateTestSheet(version, files, names);
+		wrapper.generateTestSheet(version, files, flowClassName, indexSheetName, sheetList);
 	}
 }

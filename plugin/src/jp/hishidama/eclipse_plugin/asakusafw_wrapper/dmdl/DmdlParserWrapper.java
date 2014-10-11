@@ -6,7 +6,9 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.extension.AsakusafwConfiguration;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.Activator;
@@ -149,15 +151,24 @@ public class DmdlParserWrapper {
 		return sb.toString();
 	}
 
-	public void generateTestSheet(String asakusaFwVersion, List<IFile> ifiles, List<SheetInfo> sheetInfoList)
-			throws CoreException {
+	public void generateTestSheet(String asakusaFwVersion, List<IFile> ifiles, String flowClassName,
+			String indexSheetName, List<SheetInfo> sheetList) throws CoreException {
 		String version = convertTestSheetGeneratorVersion(asakusaFwVersion);
 		List<Object[]> files = convertFiles(ifiles);
 
-		List<String[]> names = new ArrayList<String[]>(sheetInfoList.size());
-		for (SheetInfo info : sheetInfoList) {
-			String[] name = { info.srcModelName, info.srcSheetName, info.dstBookName, info.dstSheetName };
-			names.add(name);
+		List<Map<String, String>> names = new ArrayList<Map<String, String>>(sheetList.size());
+		for (SheetInfo info : sheetList) {
+			Map<String, String> map = new HashMap<String, String>();
+			map.put("flowClassName", flowClassName);
+			map.put("indexSheetName", indexSheetName);
+
+			map.put("srcModelName", info.srcModelName);
+			map.put("srcModelDescription", info.srcModelDescription);
+			map.put("srcSheetName", info.srcSheetName);
+			map.put("dstBookName", info.dstBookName);
+			map.put("dstSheetName", info.dstSheetName);
+			map.put("dstSheetDescription", info.dstSheetDescription);
+			names.add(map);
 		}
 
 		String taskName = "DMDLパーサーのロード中";

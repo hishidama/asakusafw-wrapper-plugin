@@ -13,29 +13,26 @@ public abstract class TestSheetGenerator {
 
 	private DmdlSemantics dmdlSemantics;
 
-	public void execute(DmdlSemantics dmdlSemantics, List<String[]> names) throws IOException {
+	public void execute(DmdlSemantics dmdlSemantics, List<Map<String, String>> names) throws IOException {
 		this.dmdlSemantics = dmdlSemantics;
 
 		StringBuilder sb = new StringBuilder(128);
 
 		Map<String, List<SheetInfo>> map = new LinkedHashMap<String, List<SheetInfo>>();
-		for (String[] name : names) {
-			SheetInfo info = new SheetInfo();
-			info.srcModelName = name[0];
-			info.srcSheetName = name[1];
-			info.dstBookName = name[2];
-			info.dstSheetName = name[3];
+		for (Map<String, String> name : names) {
+			SheetInfo info = new SheetInfo(name);
 
-			if (findModelDeclaration(info.srcModelName) == null) {
+			String srcModelName = info.getSrcModelName();
+			if (findModelDeclaration(srcModelName) == null) {
 				if (sb.length() == 0) {
 					sb.append("モデル定義が見つかりませんでした\n");
 				} else {
 					sb.append("\n");
 				}
-				sb.append(info.srcModelName);
+				sb.append(srcModelName);
 			}
 
-			String key = info.dstBookName;
+			String key = info.getDstBookName();
 			List<SheetInfo> list = map.get(key);
 			if (list == null) {
 				list = new ArrayList<SheetInfo>();
@@ -51,10 +48,43 @@ public abstract class TestSheetGenerator {
 	}
 
 	public static class SheetInfo {
-		public String srcModelName;
-		public String srcSheetName;
-		public String dstBookName;
-		public String dstSheetName;
+		private Map<String, String> map;
+
+		public SheetInfo(Map<String, String> map) {
+			this.map = map;
+		}
+
+		public String getDstBookName() {
+			return map.get("dstBookName");
+		}
+
+		public String getIndexSheetName() {
+			return map.get("indexSheetName");
+		}
+
+		public String getFlowClassName() {
+			return map.get("flowClassName");
+		}
+
+		public String getSrcModelName() {
+			return map.get("srcModelName");
+		}
+
+		public String getSrcModelDescription() {
+			return map.get("srcModelDescription");
+		}
+
+		public String getSrcSheetName() {
+			return map.get("srcSheetName");
+		}
+
+		public String getDstSheetName() {
+			return map.get("dstSheetName");
+		}
+
+		public String getDstSheetDescription() {
+			return map.get("dstSheetDescription");
+		}
 	}
 
 	protected final ModelDeclaration findModelDeclaration(String modelName) {

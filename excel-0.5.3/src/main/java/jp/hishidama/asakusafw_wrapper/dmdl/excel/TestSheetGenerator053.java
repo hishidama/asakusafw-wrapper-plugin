@@ -13,25 +13,30 @@ import com.asakusafw.dmdl.semantics.ModelDeclaration;
 import com.asakusafw.testdata.generator.excel.SheetBuilder;
 import com.asakusafw.testdata.generator.excel.WorkbookGenerator;
 
-public class TestSheetGenerator053 extends TestSheetGenerator {
+public class TestSheetGenerator053 extends AbstractTestSheetGenerator {
 
 	@Override
-	protected void generate(Map<String, List<SheetInfo>> map) throws IOException {
-		for (Entry<String, List<SheetInfo>> entry : map.entrySet()) {
-			SpreadsheetVersion spreadsheetVersion = getSpreadsheetVersion(entry.getKey());
+	protected void generate(Map<String, List<SheetInfo>> bookMap) throws IOException {
+		for (Entry<String, List<SheetInfo>> entry : bookMap.entrySet()) {
+			String fileName = entry.getKey();
+			List<SheetInfo> list = entry.getValue();
+
+			SpreadsheetVersion spreadsheetVersion = getSpreadsheetVersion(fileName);
 			Workbook workbook = WorkbookGenerator.createEmptyWorkbook(spreadsheetVersion);
 
-			for (SheetInfo info : entry.getValue()) {
-				ModelDeclaration model = findModelDeclaration(info.srcModelName);
+			generateIndexSheet(workbook, list);
+
+			for (SheetInfo sheet : list) {
+				ModelDeclaration model = findModelDeclaration(sheet.getSrcModelName());
 				SheetBuilder builder = new SheetBuilder(workbook, spreadsheetVersion, model);
-				if ("rule".equals(info.srcSheetName)) {
-					builder.addRule(info.dstSheetName);
+				if ("rule".equals(sheet.getSrcSheetName())) {
+					builder.addRule(sheet.getDstSheetName());
 				} else {
-					builder.addData(info.dstSheetName);
+					builder.addData(sheet.getDstSheetName());
 				}
 			}
 
-			FileOutputStream fos = new FileOutputStream(entry.getKey());
+			FileOutputStream fos = new FileOutputStream(fileName);
 			try {
 				workbook.write(fos);
 			} finally {

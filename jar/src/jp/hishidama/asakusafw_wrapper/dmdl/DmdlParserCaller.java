@@ -5,6 +5,7 @@ import java.io.Reader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.ServiceLoader;
 
 import jp.hishidama.asakusafw_wrapper.dmdl.DmdlSourceUri.Info;
@@ -98,7 +99,8 @@ public class DmdlParserCaller {
 				region.endColumn };
 	}
 
-	public void generateTestSheet(String version, List<Object[]> files, List<String[]> names) throws Exception {
+	public void generateTestSheet(String version, List<Object[]> files, List<Map<String, String>> names)
+			throws Exception {
 		List<Object[]> result = new ArrayList<Object[]>();
 		DmdlSemantics dmdlSemantics = analyze(files, result);
 

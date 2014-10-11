@@ -12,14 +12,17 @@ public class TestSheetUtil {
 
 	public static class SheetInfo {
 		public String srcModelName;
+		public String srcModelDescription;
 		public String srcSheetName;
 		public String dstBookName;
 		public String dstSheetName;
+		public String dstSheetDescription;
 	}
 
-	public static void generateTestSheet(IProject project, String version, List<SheetInfo> names,
-			IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-		TestSheetGenerateTask task = new TestSheetGenerateTask(project, version, names);
+	public static void generateTestSheet(IProject project, String version, String flowClassName, String indexSheetName,
+			List<SheetInfo> sheetList, IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+		TestSheetGenerateTask task = new TestSheetGenerateTask(project, version, flowClassName, indexSheetName,
+				sheetList);
 		task.run(monitor);
 	}
 }
