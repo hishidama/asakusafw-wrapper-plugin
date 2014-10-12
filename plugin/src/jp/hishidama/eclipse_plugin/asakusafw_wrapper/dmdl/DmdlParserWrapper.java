@@ -1,5 +1,7 @@
 package jp.hishidama.eclipse_plugin.asakusafw_wrapper.dmdl;
 
+import java.io.FileNotFoundException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URL;
@@ -180,6 +182,18 @@ public class DmdlParserWrapper {
 			Method method = c.getMethod("generateTestSheet", String.class, List.class, List.class);
 			taskName = "テストシートの作成中";
 			method.invoke(caller, version, files, names);
+		} catch (InvocationTargetException e0) {
+			Throwable e = e0.getCause();
+
+			String message;
+			if (e instanceof FileNotFoundException) {
+				message = MessageFormat.format("{0}にエラーが発生しました。\nExcelファイルが他のアプリケーションによって開かれている可能性があります。\n{1}",
+						taskName, e.getMessage());
+			} else {
+				message = MessageFormat.format("{0}にエラーが発生しました。", taskName);
+			}
+			IStatus status = LogUtil.warnStatus(message, e);
+			throw new CoreException(status);
 		} catch (Throwable e) {
 			{
 				String message = MessageFormat.format("DmdlParser#generateTestSheet() error. classpath={0}",
