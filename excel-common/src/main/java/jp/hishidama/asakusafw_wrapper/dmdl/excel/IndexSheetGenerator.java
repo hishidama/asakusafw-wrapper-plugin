@@ -32,13 +32,17 @@ public class IndexSheetGenerator {
 		this.sheetList = list;
 	}
 
-	public void generate() {
+	public boolean generate() {
 		String indexSheetName = sheetList.get(0).getIndexSheetName();
+		if (indexSheetName == null) {
+			return false;
+		}
 		this.indexSheet = workbook.createSheet(indexSheetName);
 
 		generateFormatHeader();
 		generateClassNameHeader();
 		generateSheetTable();
+		return true;
 	}
 
 	private void generateFormatHeader() {
