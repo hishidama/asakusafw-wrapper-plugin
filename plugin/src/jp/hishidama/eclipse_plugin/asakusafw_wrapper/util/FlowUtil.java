@@ -83,6 +83,9 @@ public class FlowUtil {
 	}
 
 	private static IMethod getConstructor(IType type) {
+		if (type == null) {
+			return null;
+		}
 		try {
 			for (IMethod method : type.getMethods()) {
 				if (method.isConstructor()) {
