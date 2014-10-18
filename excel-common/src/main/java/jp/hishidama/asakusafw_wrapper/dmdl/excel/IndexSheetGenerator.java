@@ -38,6 +38,12 @@ public class IndexSheetGenerator {
 			return false;
 		}
 		this.indexSheet = workbook.createSheet(indexSheetName);
+		workbook.setSheetOrder(indexSheetName, 0);
+		for (int i = 1; i < workbook.getNumberOfSheets(); i++) {
+			workbook.getSheetAt(i).setSelected(false);
+		}
+		indexSheet.setSelected(true);
+		workbook.setActiveSheet(0);
 
 		generateFormatHeader();
 		generateClassNameHeader();
@@ -205,9 +211,9 @@ public class IndexSheetGenerator {
 			{ // ハイパーリンク
 				String propertyRange;
 				if (isRule) {
-					propertyRange = String.format("INDIRECT(%s & \"!A:A\")", sheetNamePos);
+					propertyRange = String.format("'%s'!$A:$A", sheet.getDstSheetName());
 				} else {
-					propertyRange = String.format("INDIRECT(%s & \"!1:1\")", sheetNamePos);
+					propertyRange = String.format("'%s'!$1:$1", sheet.getDstSheetName());
 				}
 
 				{ // プロパティー名
@@ -233,7 +239,7 @@ public class IndexSheetGenerator {
 					Cell cell = CellUtil.getCell(row, c++);
 					if (isRule) {
 						String propertyPos = "$" + convertNumToString(row.getRowNum(), propertyIndex);
-						String formula = String.format("IF(ISERROR(%s), 1, %s)", propertyPos, propertyPos);
+						String formula = String.format("IF(ISERROR(%s), 4, %s)", propertyPos, propertyPos);
 						cell.setCellFormula(formula);
 					} else {
 						cell.setCellValue(2);

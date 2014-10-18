@@ -24,8 +24,6 @@ public class TestSheetGenerator053 extends AbstractTestSheetGenerator {
 			SpreadsheetVersion spreadsheetVersion = getSpreadsheetVersion(fileName);
 			Workbook workbook = WorkbookGenerator.createEmptyWorkbook(spreadsheetVersion);
 
-			generateIndexSheet(workbook, list);
-
 			for (SheetInfo sheet : list) {
 				ModelDeclaration model = findModelDeclaration(sheet.getSrcModelName());
 				SheetBuilder builder = new SheetBuilder(workbook, spreadsheetVersion, model);
@@ -35,6 +33,8 @@ public class TestSheetGenerator053 extends AbstractTestSheetGenerator {
 					builder.addData(sheet.getDstSheetName());
 				}
 			}
+
+			generateIndexSheet(workbook, list);
 
 			FileOutputStream fos = new FileOutputStream(fileName);
 			try {

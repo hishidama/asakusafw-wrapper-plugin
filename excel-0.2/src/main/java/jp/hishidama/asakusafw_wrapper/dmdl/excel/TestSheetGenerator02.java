@@ -21,8 +21,6 @@ public class TestSheetGenerator02 extends AbstractTestSheetGenerator {
 
 			HSSFWorkbook workbook = new HSSFWorkbook();
 
-			generateIndexSheet(workbook, list);
-
 			for (SheetInfo sheet : list) {
 				ModelDeclaration model = findModelDeclaration(sheet.getSrcModelName());
 				SheetBuilder builder = new SheetBuilder(workbook, model);
@@ -32,6 +30,8 @@ public class TestSheetGenerator02 extends AbstractTestSheetGenerator {
 					builder.addData(sheet.getDstSheetName());
 				}
 			}
+
+			generateIndexSheet(workbook, list);
 
 			FileOutputStream fos = new FileOutputStream(fileName);
 			try {
