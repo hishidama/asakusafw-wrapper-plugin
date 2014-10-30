@@ -1,12 +1,16 @@
 package jp.hishidama.eclipse_plugin.asakusafw_wrapper.dmdl;
 
+import java.io.FileNotFoundException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.extension.AsakusafwConfiguration;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.Activator;
@@ -149,15 +153,24 @@ public class DmdlParserWrapper {
 		return sb.toString();
 	}
 
-	public void generateTestSheet(String asakusaFwVersion, List<IFile> ifiles, List<SheetInfo> sheetInfoList)
-			throws CoreException {
+	public void generateTestSheet(String asakusaFwVersion, List<IFile> ifiles, String flowClassName,
+			String indexSheetName, List<SheetInfo> sheetList) throws CoreException {
 		String version = convertTestSheetGeneratorVersion(asakusaFwVersion);
 		List<Object[]> files = convertFiles(ifiles);
 
-		List<String[]> names = new ArrayList<String[]>(sheetInfoList.size());
-		for (SheetInfo info : sheetInfoList) {
-			String[] name = { info.srcModelName, info.srcSheetName, info.dstBookName, info.dstSheetName };
-			names.add(name);
+		List<Map<String, String>> names = new ArrayList<Map<String, String>>(sheetList.size());
+		for (SheetInfo info : sheetList) {
+			Map<String, String> map = new HashMap<String, String>();
+			map.put("flowClassName", flowClassName);
+			map.put("indexSheetName", indexSheetName);
+
+			map.put("srcModelName", info.srcModelName);
+			map.put("srcModelDescription", info.srcModelDescription);
+			map.put("srcSheetName", info.srcSheetName);
+			map.put("dstBookName", info.dstBookName);
+			map.put("dstSheetName", info.dstSheetName);
+			map.put("dstSheetDescription", info.dstSheetDescription);
+			names.add(map);
 		}
 
 		String taskName = "DMDLパーサーのロード中";
@@ -169,6 +182,18 @@ public class DmdlParserWrapper {
 			Method method = c.getMethod("generateTestSheet", String.class, List.class, List.class);
 			taskName = "テストシートの作成中";
 			method.invoke(caller, version, files, names);
+		} catch (InvocationTargetException e0) {
+			Throwable e = e0.getCause();
+
+			String message;
+			if (e instanceof FileNotFoundException) {
+				message = MessageFormat.format("{0}にエラーが発生しました。\nExcelファイルが他のアプリケーションによって開かれている可能性があります。\n{1}",
+						taskName, e.getMessage());
+			} else {
+				message = MessageFormat.format("{0}にエラーが発生しました。", taskName);
+			}
+			IStatus status = LogUtil.warnStatus(message, e);
+			throw new CoreException(status);
 		} catch (Throwable e) {
 			{
 				String message = MessageFormat.format("DmdlParser#generateTestSheet() error. classpath={0}",

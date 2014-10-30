@@ -112,12 +112,8 @@ public abstract class AsakusafwConfiguration {
 	 * @since 2013.11.22
 	 */
 	public static int compareVersion(String ver1, String ver2) {
-		if (ver1 == null) {
-			ver1 = "ANY";
-		}
-		if (ver2 == null) {
-			ver2 = "ANY";
-		}
+		ver1 = cleanVersion(ver1);
+		ver2 = cleanVersion(ver2);
 		String[] ss1 = ver1.split("\\.|\\-");
 		String[] ss2 = ver2.split("\\.|\\-");
 		int n = Math.max(ss1.length, ss2.length);
@@ -142,6 +138,16 @@ public abstract class AsakusafwConfiguration {
 			}
 		}
 		return 0;
+	}
+
+	private static String cleanVersion(String ver) {
+		if (ver == null) {
+			return "ANY";
+		}
+		if (ver.endsWith("-hadoop1") || ver.endsWith("-hadoop2")) {
+			return ver.substring(0, ver.length() - "-hadoop1".length());
+		}
+		return ver;
 	}
 
 	/**

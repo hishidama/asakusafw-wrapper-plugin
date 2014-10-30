@@ -4,6 +4,8 @@
 		<jar jarfile="../plugin/resource/dmdlparser-caller.jar">
 			<fileset dir="classes" />
 			<fileset dir="src" />
+			<fileset dir="../excel-common/classes" />
+			<fileset dir="../excel-common/src/main/java" />
 			<fileset dir="../excel-0.2/classes" />
 			<fileset dir="../excel-0.2/src/main/java" />
 			<fileset dir="../excel-0.5.3/classes" />
