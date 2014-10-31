@@ -49,6 +49,11 @@ public class OpenDeclaredOperatorHyperlinkDetector extends JdtHyperlinkDetector 
 				if (method.getElementName().equals(name)) {
 					return new IHyperlink[] { new DeclaredOperatorHyperlink(method, word) };
 				}
+			}
+			for (IMethod method : operator.getMethods()) {
+				if (convertUnderscoreName(method.getElementName()).equals(name)) {
+					return new IHyperlink[] { new DeclaredOperatorHyperlink(method, word) };
+				}
 				if (method.isConstructor()) {
 					if (constructor == null) {
 						constructor = method;
@@ -71,5 +76,27 @@ public class OpenDeclaredOperatorHyperlinkDetector extends JdtHyperlinkDetector 
 			return null;
 		}
 		return TypeUtil.resolveType(value, type);
+	}
+
+	private String convertUnderscoreName(String name) {
+		if (!name.contains("_")) {
+			return name;
+		}
+
+		if (StringUtil.isAll(name, '_')) {
+			return "_";
+		}
+
+		String[] parts = name.split("_");
+		StringBuilder sb = new StringBuilder(name.length());
+		for (String part : parts) {
+			if (sb.length() == 0) {
+				sb.append(part.toLowerCase());
+			} else {
+				sb.append(Character.toUpperCase(part.charAt(0)));
+				sb.append(part.substring(1).toLowerCase());
+			}
+		}
+		return sb.toString();
 	}
 }
