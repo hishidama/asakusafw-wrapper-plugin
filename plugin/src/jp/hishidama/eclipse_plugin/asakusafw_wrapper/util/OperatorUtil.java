@@ -4,6 +4,8 @@ import jp.hishidama.eclipse_plugin.util.StringUtil;
 
 public class OperatorUtil {
 
+	public static final String KEY_NAME = "com.asakusafw.vocabulary.model.Key";
+
 	public static String convertUnderscoreName(String name) {
 		if (!name.contains("_")) {
 			return name;
