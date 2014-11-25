@@ -43,11 +43,7 @@ public class FlowParameter {
 			if (n < 0) {
 				modelClassName = "";
 			} else {
-				int m = type.lastIndexOf('>');
-				if (m < 0) {
-					m = type.length();
-				}
-				modelClassName = type.substring(n + 1, m);
+				modelClassName = AfwStringUtil.extractModelClassName(type);
 			}
 		}
 		return modelClassName;
