@@ -37,6 +37,9 @@ public class MasterSelectionStringCompletionProposalComputer implements IJavaCom
 		ICompilationUnit cu = javaContext.getCompilationUnit();
 		int offset = context.getInvocationOffset();
 		MasterSelectionFinder finder = new MasterSelectionFinder(cu, offset);
+		if (finder.getMemberName() == null) {
+			return Collections.emptyList();
+		}
 
 		String prefix = getPrefix(finder, offset);
 		if (prefix == null) {
