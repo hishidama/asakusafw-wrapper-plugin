@@ -12,10 +12,12 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 public class FileHyperlink implements IHyperlink {
 	private IFile file;
 	private IRegion region;
+	private boolean system;
 
-	public FileHyperlink(IFile file, IRegion region) {
+	public FileHyperlink(IFile file, IRegion region, boolean systemEditor) {
 		this.file = file;
 		this.region = region;
+		this.system = systemEditor;
 	}
 
 	@Override
@@ -36,7 +38,11 @@ public class FileHyperlink implements IHyperlink {
 	@Override
 	public void open() {
 		try {
-			FileUtil.openEditor(file);
+			if (system) {
+				FileUtil.openSystemEditor(file);
+			} else {
+				FileUtil.openEditor(file);
+			}
 		} catch (Exception e) {
 			LogUtil.logWarn(MessageFormat.format("{0} openEditor error.", getClass().getSimpleName()), e);
 		}
