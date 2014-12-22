@@ -72,14 +72,22 @@ public class PorterUtil {
 		return TypeUtil.isImplements(type, MODEL_OUTPUT_NAME);
 	}
 
-	public static boolean isPorterOrFormat(IType type) {
-		Set<String> set = new HashSet<String>();
+	public static String getPorterOrFormatInterfaceName(IType type) {
+		Set<String> set = new HashSet<String>(2);
 		set.add(IMPORTER_NAME);
 		set.add(EXPORTER_NAME);
 		set.add(DATA_FORMAT_NAME);
 		set.add(MODEL_INPUT_NAME);
 		set.add(MODEL_OUTPUT_NAME);
-		return TypeUtil.findImplements(type, set) != null;
+		return TypeUtil.findImplements(type, set);
+	}
+
+	public static boolean isImPorterOrInput(String name) {
+		return IMPORTER_NAME.equals(name) || DATA_FORMAT_NAME.equals(name) || MODEL_INPUT_NAME.equals(name);
+	}
+
+	public static boolean isExPorterOrOutput(String name) {
+		return EXPORTER_NAME.equals(name) || DATA_FORMAT_NAME.equals(name) || MODEL_OUTPUT_NAME.equals(name);
 	}
 
 	public static String getModelClassName(IJavaProject javaProject, String porterClassName) {
