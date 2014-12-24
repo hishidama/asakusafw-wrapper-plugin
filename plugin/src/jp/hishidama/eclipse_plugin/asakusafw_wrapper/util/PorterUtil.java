@@ -37,6 +37,10 @@ public class PorterUtil {
 	public static final String WINDGATE_JDBC_IMPORTER_NAME = "com.asakusafw.vocabulary.windgate.JdbcImporterDescription";
 	public static final String WINDGATE_JDBC_EXPORTER_NAME = "com.asakusafw.vocabulary.windgate.JdbcExporterDescription";
 
+	public static final String DATA_FORMAT_NAME = "com.asakusafw.runtime.directio.DataFormat";
+	public static final String MODEL_INPUT_NAME = "com.asakusafw.runtime.io.ModelInput";
+	public static final String MODEL_OUTPUT_NAME = "com.asakusafw.runtime.io.ModelOutput";
+
 	public static boolean isImporter(IType type) {
 		return TypeUtil.isImplements(type, IMPORTER_NAME);
 	}
@@ -54,6 +58,36 @@ public class PorterUtil {
 		set.add(IMPORTER_NAME);
 		set.add(EXPORTER_NAME);
 		return TypeUtil.findImplements(type, set);
+	}
+
+	public static boolean isDataFormat(IType type) {
+		return TypeUtil.isImplements(type, DATA_FORMAT_NAME);
+	}
+
+	public static boolean isModelInput(IType type) {
+		return TypeUtil.isImplements(type, MODEL_INPUT_NAME);
+	}
+
+	public static boolean isModelOutput(IType type) {
+		return TypeUtil.isImplements(type, MODEL_OUTPUT_NAME);
+	}
+
+	public static String getPorterOrFormatInterfaceName(IType type) {
+		Set<String> set = new HashSet<String>(2);
+		set.add(IMPORTER_NAME);
+		set.add(EXPORTER_NAME);
+		set.add(DATA_FORMAT_NAME);
+		set.add(MODEL_INPUT_NAME);
+		set.add(MODEL_OUTPUT_NAME);
+		return TypeUtil.findImplements(type, set);
+	}
+
+	public static boolean isImPorterOrInput(String name) {
+		return IMPORTER_NAME.equals(name) || DATA_FORMAT_NAME.equals(name) || MODEL_INPUT_NAME.equals(name);
+	}
+
+	public static boolean isExPorterOrOutput(String name) {
+		return EXPORTER_NAME.equals(name) || DATA_FORMAT_NAME.equals(name) || MODEL_OUTPUT_NAME.equals(name);
 	}
 
 	public static String getModelClassName(IJavaProject javaProject, String porterClassName) {

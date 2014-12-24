@@ -24,7 +24,7 @@ public class OpenExcelHyperlinkDetector extends CompilationUnitHyperlinkDetector
 			IFile file = project.getFile(String.format("src/test/resources/%s/%s",
 					pack.getElementName().replace('.', '/'), excelName));
 			if (file.exists()) {
-				return new IHyperlink[] { new FileHyperlink(file, finder.getRegion()) };
+				return new IHyperlink[] { new FileHyperlink(file, finder.getRegion(), true) };
 			}
 		}
 
