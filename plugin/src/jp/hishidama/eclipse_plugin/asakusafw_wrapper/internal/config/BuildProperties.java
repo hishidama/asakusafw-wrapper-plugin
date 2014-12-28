@@ -42,6 +42,26 @@ public class BuildProperties extends AsakusafwProperties {
 		return getProperty("asakusa.testdatasheet.output");
 	}
 
+	@Override
+	public String getCompiledSourceDirectory() {
+		return getProperty("asakusa.batchc.dir");
+	}
+
+	@Override
+	public String getCompiledSourcePackage() {
+		return getProperty("asakusa.package.default");
+	}
+
+	@Override
+	public String getHadoopWorkDirectory() {
+		return getProperty("asakusa.hadoopwork.dir");
+	}
+
+	@Override
+	public String getCompilerWorkDirectory() {
+		return getProperty("asakusa.compilerwork.dir");
+	}
+
 	private String getProperty(String key) {
 		if (properties == null) {
 			return null;

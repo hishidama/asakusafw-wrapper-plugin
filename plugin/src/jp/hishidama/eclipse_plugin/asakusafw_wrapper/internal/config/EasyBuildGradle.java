@@ -57,6 +57,26 @@ public class EasyBuildGradle extends AsakusafwProperties {
 		return "build/excel";
 	}
 
+	@Override
+	public String getCompiledSourceDirectory() {
+		return "build/batchc";
+	}
+
+	@Override
+	public String getCompiledSourcePackage() {
+		return getProperty("compiledSourcePackage");
+	}
+
+	@Override
+	public String getHadoopWorkDirectory() {
+		return "target/hadoopwork/${execution_id}";
+	}
+
+	@Override
+	public String getCompilerWorkDirectory() {
+		return null;
+	}
+
 	private String getProperty(String key) {
 		return properties.get(key);
 	}

@@ -49,4 +49,36 @@ public abstract class AsakusafwProperties {
 	 * @since 2014.05.04
 	 */
 	public abstract String getTestDataSheetOutput();
+
+	/**
+	 * コンパイルされたソースディレクトリー.
+	 * 
+	 * @return ディレクトリーのパス
+	 * @since 2014.12.28
+	 */
+	public abstract String getCompiledSourceDirectory();
+
+	/**
+	 * コンパイルされたソースのパッケージ名.
+	 * 
+	 * @return パッケージ名
+	 * @since 2014.12.28
+	 */
+	public abstract String getCompiledSourcePackage();
+
+	/**
+	 * Hadoopワークディレクトリー.
+	 * 
+	 * @return ディレクトリーのパス
+	 * @since 2014.12.28
+	 */
+	public abstract String getHadoopWorkDirectory();
+
+	/**
+	 * コンパイラーワークディレクトリー.
+	 * 
+	 * @return ディレクトリーのパス
+	 * @since 2014.12.28
+	 */
+	public abstract String getCompilerWorkDirectory();
 }

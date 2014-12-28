@@ -46,6 +46,16 @@
             id="jp.hishidama.asakusafwWrapper.command.dmdlCompile"
             name="DMDL compile">
       </command>
+      <command
+            categoryId="jp.hishidama.asakusafwWrapper.category"
+            id="jp.hishidama.asakusafwWrapper.command.batchCompile"
+            name="Compile Batch">
+      </command>
+      <command
+            categoryId="jp.hishidama.asakusafwWrapper.category"
+            id="jp.hishidama.asakusafwWrapper.command.batchCompile.editorMenu"
+            name="Compile Batch">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -61,6 +71,36 @@
             class="jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.handler.DMDLCompileHandler"
             commandId="jp.hishidama.asakusafwWrapper.command.dmdlCompile">
       </handler>
+      <handler
+            class="jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.handler.BatchCompileHandler"
+            commandId="jp.hishidama.asakusafwWrapper.command.batchCompile">
+      </handler>
+      <handler
+            class="jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.handler.BatchCompileHandler"
+            commandId="jp.hishidama.asakusafwWrapper.command.batchCompile.editorMenu">
+         <enabledWhen>
+            <and>
+               <with variable="activeEditorId">
+                  <equals value="org.eclipse.jdt.ui.CompilationUnitEditor" />
+               </with>
+               <with variable="activeEditor">
+                  <test
+                        forcePluginActivation="true"
+                        property="jp.hishidama.eclipse_plugin.asakusafw_wrapper.jdt.isBatchClass" />
+               </with>
+            </and>
+         </enabledWhen>
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.handler.AfwJdtPropertyTester"
+            id="jp.hishidama.eclipse_plugin.asakusafw_wrapper.AfwJdtPropertyTester"
+            namespace="jp.hishidama.eclipse_plugin.asakusafw_wrapper.jdt"
+            properties="isFlowClass,isBatchClass"
+            type="org.eclipse.ui.texteditor.ITextEditor">
+      </propertyTester>
    </extension>
    <extension
          point="org.eclipse.ui.workbench.texteditor.hyperlinkDetectors">
@@ -116,5 +156,14 @@
                type="__dftl_partition_content_type">
          </partition>
       </javaCompletionProposalComputer>
+   </extension>
+   <extension
+         point="org.eclipse.core.variables.dynamicVariables">
+      <variable
+            description="AsakusaFW execution_id"
+            name="execution_id"
+            resolver="jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.task.ExecutionIdVariableResolver"
+            supportsArgument="true">
+      </variable>
    </extension>
 </plugin>
