@@ -17,6 +17,7 @@ import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.Activator;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.LogUtil;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.util.ParserClassUtil;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.util.TestSheetUtil.SheetInfo;
+import jp.hishidama.eclipse_plugin.util.JdtUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -64,7 +65,7 @@ public class DmdlParserWrapper {
 	}
 
 	protected void findClassPath(List<URL> list, IJavaProject javaProject) {
-		ParserClassUtil.getProjectClassPath(list, javaProject);
+		JdtUtil.collectProjectClassPath(list, javaProject);
 		this.project = javaProject.getProject();
 		ParserClassUtil.getClassPath(list, project);
 	}
