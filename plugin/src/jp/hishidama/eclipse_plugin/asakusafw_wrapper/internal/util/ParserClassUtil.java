@@ -3,7 +3,6 @@ package jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.util;
 import static jp.hishidama.eclipse_plugin.util.StringUtil.isEmpty;
 
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +13,7 @@ import jp.hishidama.eclipse_plugin.asakusafw_wrapper.extension.AsakusafwConfigur
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.extension.AsakusafwConfiguration.Library;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.Activator;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.LogUtil;
+import jp.hishidama.eclipse_plugin.util.JdtUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -21,11 +21,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.jdt.core.IClasspathContainer;
-import org.eclipse.jdt.core.IClasspathEntry;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 public class ParserClassUtil {
@@ -42,92 +37,13 @@ public class ParserClassUtil {
 			if (lib.selected) {
 				try {
 					IPath pp = Path.fromPortableString(lib.path);
-					URL url = toURL(project, pp);
+					URL url = JdtUtil.toURL(project, pp);
 					if (url != null) {
 						list.add(url);
 					}
 				} catch (MalformedURLException e) {
 					LogUtil.logWarn(ParserClassUtil.class.getSimpleName(), e);
 				}
-			}
-		}
-	}
-
-	private static URL toURL(IProject project, IPath path) throws MalformedURLException {
-		if (path == null) {
-			return null;
-		}
-		if (path.toFile().exists()) {
-			URL url = path.toFile().toURI().toURL();
-			return url;
-		}
-		IPath vp = JavaCore.getResolvedVariablePath(path);
-		if (vp != null) {
-			URL url = vp.toFile().toURI().toURL();
-			return url;
-		}
-		try {
-			IFile file = project.getFile(path);
-			if (file.exists()) {
-				URI uri = file.getLocationURI();
-				if (uri != null) {
-					return uri.toURL();
-				}
-			}
-		} catch (Exception e) {
-			LogUtil.logWarn("toURL()", e);
-		}
-		try {
-			IFile file = project.getParent().getFile(path);
-			if (file.exists()) {
-				URI uri = file.getLocationURI();
-				if (uri != null) {
-					return uri.toURL();
-				}
-			}
-		} catch (Exception e) {
-			LogUtil.logWarn("toURL()", e);
-		}
-		return null;
-	}
-
-	public static void getProjectClassPath(List<URL> list, IJavaProject project) {
-		try {
-			IClasspathEntry[] cp = project.getRawClasspath();
-			getClassPath(list, project, cp);
-		} catch (JavaModelException e) {
-			LogUtil.logWarn("getProjectClassPath()", e);
-		}
-	}
-
-	private static void getClassPath(List<URL> list, IJavaProject project, IClasspathEntry[] cp) {
-		for (IClasspathEntry ce : cp) {
-			URL url = null;
-			try {
-				switch (ce.getEntryKind()) {
-				case IClasspathEntry.CPE_SOURCE:
-					url = toURL(project.getProject(), ce.getOutputLocation());
-					break;
-				case IClasspathEntry.CPE_VARIABLE:
-					url = toURL(project.getProject(), JavaCore.getResolvedVariablePath(ce.getPath()));
-					break;
-				case IClasspathEntry.CPE_LIBRARY:
-					url = toURL(project.getProject(), ce.getPath());
-					break;
-				case IClasspathEntry.CPE_CONTAINER:
-					if (!ce.getPath().toPortableString().contains("JRE_CONTAINER")) {
-						IClasspathContainer cr = JavaCore.getClasspathContainer(ce.getPath(), project);
-						getClassPath(list, project, cr.getClasspathEntries());
-					}
-					break;
-				default:
-					break;
-				}
-			} catch (Exception e) {
-				LogUtil.logWarn("getClassPath()", e);
-			}
-			if (url != null) {
-				list.add(url);
 			}
 		}
 	}
