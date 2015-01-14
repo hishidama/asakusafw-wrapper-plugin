@@ -49,6 +49,26 @@ public class GradlePrefs extends AsakusafwProperties {
 		return getProperty("com.asaksuafw.asakusafw.testtools.testDataSheetDirectory");
 	}
 
+	@Override
+	public String getCompiledSourceDirectory() {
+		return getProperty("com.asaksuafw.asakusafw.compiler.compiledSourceDirectory");
+	}
+
+	@Override
+	public String getCompiledSourcePackage() {
+		return getProperty("com.asaksuafw.asakusafw.compiler.compiledSourcePackage");
+	}
+
+	@Override
+	public String getHadoopWorkDirectory() {
+		return getProperty("com.asaksuafw.asakusafw.compiler.hadoopWorkDirectory");
+	}
+
+	@Override
+	public String getCompilerWorkDirectory() {
+		return getProperty("com.asaksuafw.asakusafw.compiler.compilerWorkDirectory");
+	}
+
 	private String getProperty(String key) {
 		return properties.getProperty(key);
 	}

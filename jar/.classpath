@@ -8,6 +8,9 @@
 	<classpathentry kind="lib" path="lib/slf4j-api-1.7.5.jar"/>
 	<classpathentry kind="lib" path="lib/collections-0.5.1.jar"/>
 	<classpathentry kind="lib" path="lib/simple-graph-0.5.1.jar"/>
+	<classpathentry kind="lib" path="lib/ashigel-compiler-bootstrap-0.7.0-hadoop1.jar" sourcepath="lib/ashigel-compiler-bootstrap-0.7.0-hadoop1-sources.jar"/>
+	<classpathentry kind="lib" path="lib/asakusa-dsl-vocabulary-0.7.0-hadoop1.jar" sourcepath="lib/asakusa-dsl-vocabulary-0.7.0-hadoop1-sources.jar"/>
+	<classpathentry kind="lib" path="lib/ashigel-compiler-0.7.0-hadoop1.jar" sourcepath="lib/ashigel-compiler-0.7.0-hadoop1-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
