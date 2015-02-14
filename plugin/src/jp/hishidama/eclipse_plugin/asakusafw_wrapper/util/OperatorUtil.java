@@ -1,6 +1,10 @@
 package jp.hishidama.eclipse_plugin.asakusafw_wrapper.util;
 
+import jp.hishidama.eclipse_plugin.asakusafw_wrapper.operator.OperatorType;
+import jp.hishidama.eclipse_plugin.jdt.util.AnnotationUtil;
 import jp.hishidama.eclipse_plugin.util.StringUtil;
+
+import org.eclipse.jdt.core.IMethod;
 
 public class OperatorUtil {
 
@@ -26,5 +30,9 @@ public class OperatorUtil {
 			}
 		}
 		return sb.toString();
+	}
+
+	public static boolean isOperator(IMethod method, OperatorType operator) {
+		return AnnotationUtil.getAnnotation(method.getDeclaringType(), method, operator.getTypeName()) != null;
 	}
 }
