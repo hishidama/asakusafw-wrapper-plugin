@@ -47,6 +47,11 @@
             name="DMDL compile">
       </command>
       <command
+            categoryId="jp.hishidama.xtext.dmdl_editor.jdt.category"
+            id="jp.hishidama.asakusafwWrapper.command.openOperator"
+            name="Open Operator">
+      </command>
+      <command
             categoryId="jp.hishidama.asakusafwWrapper.category"
             id="jp.hishidama.asakusafwWrapper.command.batchCompile"
             name="Compile Batch">
@@ -72,6 +77,10 @@
             commandId="jp.hishidama.asakusafwWrapper.command.dmdlCompile">
       </handler>
       <handler
+            class="jp.hishidama.eclipse_plugin.asakusafw_wrapper.jdt.hyperlink.OpenDeclaredOperatorHyperlinkHandler"
+            commandId="jp.hishidama.asakusafwWrapper.command.openOperator">
+      </handler>
+      <handler
             class="jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.handler.BatchCompileHandler"
             commandId="jp.hishidama.asakusafwWrapper.command.batchCompile">
       </handler>
@@ -91,6 +100,16 @@
             </and>
          </enabledWhen>
       </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.jdt.ui.CompilationUnitEditor.EditorContext?after=OpenEditor">
+         <command
+               commandId="jp.hishidama.asakusafwWrapper.command.openOperator">
+         </command>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.core.expressions.propertyTesters">
