@@ -2,8 +2,6 @@ package jp.hishidama.eclipse_plugin.asakusafw_wrapper.property;
 
 import java.io.File;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.Activator;
 import jp.hishidama.eclipse_plugin.util.StringUtil;
@@ -12,13 +10,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -120,33 +113,7 @@ public class AsakusafwBatchCompilerPropertyPage extends PropertyPage {
 	}
 
 	private static String getDefaultLinkingResources(IProject project) {
-		List<String> list = new ArrayList<String>();
-		try {
-			String projectName = project.getName();
-			IJavaProject javaProject = JavaCore.create(project);
-
-			IPath location = javaProject.getOutputLocation();
-			addToList(list, projectName, location);
-
-			for (IClasspathEntry entry : javaProject.getRawClasspath()) {
-				location = entry.getOutputLocation();
-				addToList(list, projectName, location);
-			}
-
-		} catch (JavaModelException e) {
-			// fall through
-		}
-		return StringUtil.mkString(list, File.pathSeparator);
-	}
-
-	private static void addToList(List<String> list, String projectName, IPath location) {
-		if (location != null) {
-			if (projectName.equals(location.segment(0))) {
-				location = location.removeFirstSegments(1);
-			}
-			String s = location.toPortableString().replaceAll("\"", "");
-			list.add(s);
-		}
+		return "build/classes/main";
 	}
 
 	public static String getPluginLocations(IProject project) {
