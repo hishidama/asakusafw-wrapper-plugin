@@ -6,7 +6,9 @@ import java.util.List;
 
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.Activator;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.LogUtil;
+import jp.hishidama.eclipse_plugin.asakusafw_wrapper.property.AsakusafwBatchCompilerPropertyPage;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.util.BuildPropertiesUtil;
+import jp.hishidama.eclipse_plugin.util.StringUtil;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -46,8 +48,10 @@ public class BatchCompilerLaunchTask implements IWorkspaceRunnable {
 			if (arguments == null) {
 				return;
 			}
-			ILaunchConfiguration config = createConfiguration(new SubProgressMonitor(monitor, 10), arguments);
-			launch(new SubProgressMonitor(monitor, 70), config, false);
+			String vmArguments = createVmArguments(new SubProgressMonitor(monitor, 5));
+			ILaunchConfiguration config = createConfiguration(new SubProgressMonitor(monitor, 10), arguments,
+					vmArguments);
+			launch(new SubProgressMonitor(monitor, 65), config, false);
 			refresh(new SubProgressMonitor(monitor, 10));
 			return;
 		} catch (CoreException e) {
@@ -101,8 +105,42 @@ public class BatchCompilerLaunchTask implements IWorkspaceRunnable {
 		}
 	}
 
-	private ILaunchConfigurationWorkingCopy createConfiguration(IProgressMonitor monitor, String programArguments)
-			throws CoreException {
+	private String createVmArguments(IProgressMonitor monitor) throws CoreException {
+		assert monitor != null;
+		monitor.beginTask("create VM arguments", 2);
+		try {
+			monitor.subTask("create VM arguments");
+			checkCancel(monitor);
+
+			StringBuilder sb = new StringBuilder(256);
+			{
+				String link = AsakusafwBatchCompilerPropertyPage.getLinkingResources(project);
+				if (StringUtil.nonEmpty(link)) {
+					sb.append("-Djp.hishidama.asakusafw_wrapper.batch.BatchCompilerDriver.linkingResources=");
+					sb.append('"');
+					sb.append(link);
+					sb.append('"');
+				}
+				monitor.worked(1);
+			}
+			{
+				String plugin = AsakusafwBatchCompilerPropertyPage.getPluginLocations(project);
+				if (StringUtil.nonEmpty(plugin)) {
+					sb.append(" -Djp.hishidama.asakusafw_wrapper.batch.BatchCompilerDriver.pluginLocations=");
+					sb.append('"');
+					sb.append(plugin);
+					sb.append('"');
+				}
+				monitor.worked(1);
+			}
+			return sb.toString();
+		} finally {
+			monitor.done();
+		}
+	}
+
+	private ILaunchConfigurationWorkingCopy createConfiguration(IProgressMonitor monitor, String programArguments,
+			String vmArguments) throws CoreException {
 		monitor.beginTask("create configuration", 1);
 		try {
 			monitor.subTask("create configuration");
@@ -111,7 +149,6 @@ public class BatchCompilerLaunchTask implements IWorkspaceRunnable {
 			String mainClassName = "jp.hishidama.asakusafw_wrapper.batch.BatchCompilerDriver";
 			String classpathProviderId = DmdlClasspathProvider.ID;
 			IPath workingDirectory = project.getLocation();
-			String vmArguments = "";
 
 			ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
 			ILaunchConfigurationType type = manager

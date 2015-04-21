@@ -29,6 +29,9 @@ public class BatchCompilerDriver {
 
 	static final Logger LOG = LoggerFactory.getLogger(BatchCompilerDriver.class);
 
+	private static final String linkingResourcesKey = "jp.hishidama.asakusafw_wrapper.batch.BatchCompilerDriver.linkingResources";
+	private static final String pluginLocationsKey = "jp.hishidama.asakusafw_wrapper.batch.BatchCompilerDriver.pluginLocations";
+
 	/**
 	 * プログラムエントリー.
 	 * 
@@ -50,6 +53,7 @@ public class BatchCompilerDriver {
 	public boolean start(String[] args) throws Exception {
 		if (args.length < 3) {
 			System.err.println("args: property-file base-directory className...");
+			System.err.printf("VMargs: -D%s=PATHS -D%s=PATHS%n", linkingResourcesKey, pluginLocationsKey);
 			return false;
 		}
 		String fileName = args[0];
@@ -68,7 +72,7 @@ public class BatchCompilerDriver {
 
 		if (link != null) {
 			for (String s : link.split(File.pathSeparator)) {
-				linkingResources.add(new File(s));
+				linkingResources.add(newFile(baseDir, s));
 			}
 		}
 		List<URL> pluginLocations = Lists.create();
@@ -78,7 +82,7 @@ public class BatchCompilerDriver {
 					continue;
 				}
 				try {
-					File file = new File(s);
+					File file = newFile(baseDir, s);
 					if (!file.exists()) {
 						throw new FileNotFoundException(file.getAbsolutePath());
 					}
@@ -127,11 +131,19 @@ public class BatchCompilerDriver {
 	}
 
 	protected String getLinkingResources() {
-		return null;
+		return System.getProperty(linkingResourcesKey);
 	}
 
 	protected String getPluginLocations() {
-		return null;
+		return System.getProperty(pluginLocationsKey);
+	}
+
+	protected static File newFile(String baseDir, String path) {
+		File file = new File(path);
+		if (file.isAbsolute()) {
+			return file;
+		}
+		return new File(baseDir, path);
 	}
 
 	protected static Class<? extends BatchDescription> loadIfBatchClass(String className) {
