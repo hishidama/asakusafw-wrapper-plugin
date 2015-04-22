@@ -10,8 +10,11 @@ import jp.hishidama.eclipse_plugin.asakusafw_wrapper.util.BatchUtil;
 import jp.hishidama.eclipse_plugin.util.JdtUtil;
 
 import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.Parameterization;
+import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -26,6 +29,9 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.handlers.IHandlerService;
+import org.eclipse.ui.services.IServiceLocator;
 
 public class BatchCompileHandler extends AbstractHandler {
 
@@ -41,7 +47,8 @@ public class BatchCompileHandler extends AbstractHandler {
 			return null;
 		}
 
-		launchCompile(typeList);
+		launchCompileJava();
+		launchCompileBatch(typeList);
 
 		return null;
 	}
@@ -113,7 +120,23 @@ public class BatchCompileHandler extends AbstractHandler {
 		}
 	}
 
-	void launchCompile(List<IType> typeList) {
+	void launchCompileJava() throws ExecutionException {
+		IServiceLocator serviceLocator = PlatformUI.getWorkbench();
+
+		try {
+			ICommandService commandService = (ICommandService) serviceLocator.getService(ICommandService.class);
+			Command command = commandService.getCommand("com.asakusafw.shafu.ui.buildProject");
+			Parameterization[] params = { new Parameterization(command.getParameter("taskNames"), "compileJava") };
+			ParameterizedCommand parametrizedCommand = new ParameterizedCommand(command, params);
+
+			IHandlerService handlerService = (IHandlerService) serviceLocator.getService(IHandlerService.class);
+			handlerService.executeCommand(parametrizedCommand, null);
+		} catch (Exception e) {
+			throw new ExecutionException("Shafu execute error", e);
+		}
+	}
+
+	void launchCompileBatch(List<IType> typeList) {
 		final BatchCompilerLaunchTask task = new BatchCompilerLaunchTask(typeList);
 
 		WorkspaceJob job = new WorkspaceJob("Batch compile") {
