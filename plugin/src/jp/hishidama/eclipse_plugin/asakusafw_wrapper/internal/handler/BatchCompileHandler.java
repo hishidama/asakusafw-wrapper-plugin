@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.LogUtil;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.task.BatchCompilerLaunchTask;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.util.BatchUtil;
 import jp.hishidama.eclipse_plugin.util.JdtUtil;
@@ -132,7 +133,7 @@ public class BatchCompileHandler extends AbstractHandler {
 			IHandlerService handlerService = (IHandlerService) serviceLocator.getService(IHandlerService.class);
 			handlerService.executeCommand(parametrizedCommand, null);
 		} catch (Exception e) {
-			throw new ExecutionException("Shafu execute error", e);
+			LogUtil.logWarn("Shafu execute error", e);
 		}
 	}
 
