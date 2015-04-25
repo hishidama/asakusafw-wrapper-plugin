@@ -38,6 +38,8 @@ import org.eclipse.ui.services.IServiceLocator;
 
 public class BatchCompileHandler extends AbstractHandler {
 
+	private List<IType> beforeTypeList = Collections.emptyList();
+
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		if (!PlatformUI.getWorkbench().saveAllEditors(true)) {
@@ -46,9 +48,13 @@ public class BatchCompileHandler extends AbstractHandler {
 
 		List<IType> typeList = getBatchType(event);
 		if (typeList.isEmpty()) {
+			typeList = beforeTypeList;
+		}
+		if (typeList.isEmpty()) {
 			MessageDialog.openInformation(null, "Batch compile", "クラスが見つかりませんでした。\nバッチクラスを選択してから実行して下さい。");
 			return null;
 		}
+		beforeTypeList = typeList;
 
 		IProject project = null;
 		for (IType type : typeList) {
