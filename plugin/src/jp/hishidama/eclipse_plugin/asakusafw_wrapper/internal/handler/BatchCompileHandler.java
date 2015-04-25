@@ -56,14 +56,7 @@ public class BatchCompileHandler extends AbstractHandler {
 		}
 		beforeTypeList = typeList;
 
-		IProject project = null;
-		for (IType type : typeList) {
-			project = type.getJavaProject().getProject();
-			if (project != null) {
-				break;
-			}
-		}
-
+		IProject project = typeList.get(0).getJavaProject().getProject();
 		launchCompileJava(project);
 		launchCompileBatch(typeList);
 
@@ -157,6 +150,8 @@ public class BatchCompileHandler extends AbstractHandler {
 			handlerService.executeCommand(parametrizedCommand, null);
 		} catch (Exception e) {
 			LogUtil.logWarn("Shafu execute error", e);
+			MessageDialog.openWarning(null, "Batch compile : compileJava",
+					"ShafuのcompileJavaコマンドの実行に失敗しました。\nShafuがインストールされているかどうか確認して下さい。");
 		}
 	}
 
