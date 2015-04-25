@@ -15,6 +15,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -25,9 +26,11 @@ public class AsakusafwBatchCompilerPropertyPage extends PropertyPage {
 
 	public static final String LINKING_RESOURCES_KEY = "AsakusafwBatchCompilerPropertyPage.LINKING_RESOURCES";
 	public static final String PLUGIN_LOCATIONS_KEY = "AsakusafwBatchCompilerPropertyPage.PLUGIN_LOCATIONS";
+	public static final String COMPILE_JAVA_KEY = "AsakusafwBatchCompilerPropertyPage.COMPILE_JAVA";
 
 	private Text linkingResourcesText;
 	private Text pluginLocationsText;
+	private Button compileJavaButton;
 
 	public AsakusafwBatchCompilerPropertyPage() {
 		setDescription(MessageFormat.format("Asakusa FrameworkのBatchCompilerに渡す引数を指定してください。（パス区切り文字は「{0}」）",
@@ -46,6 +49,7 @@ public class AsakusafwBatchCompilerPropertyPage extends PropertyPage {
 
 		createLinkingResourcesField(composite);
 		createPluginLocationsField(composite);
+		createCompileJavaField(composite);
 		load(getProject());
 
 		return composite;
@@ -67,11 +71,18 @@ public class AsakusafwBatchCompilerPropertyPage extends PropertyPage {
 		pluginLocationsText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 	}
 
+	private void createCompileJavaField(Composite composite) {
+		new Label(composite, SWT.NONE).setText("compileJava:");
+		compileJavaButton = new Button(composite, SWT.CHECK);
+		compileJavaButton.setText("バッチコンパイル前にJavaソースのコンパイルを行う（Shafuがインストールされている場合のみ）");
+	}
+
 	@Override
 	protected void performDefaults() {
 		IProject project = getProject();
 		linkingResourcesText.setText(StringUtil.nonNull(getDefaultLinkingResources(project)));
 		pluginLocationsText.setText("");
+		compileJavaButton.setSelection(true);
 
 		super.performDefaults();
 	}
@@ -102,6 +113,7 @@ public class AsakusafwBatchCompilerPropertyPage extends PropertyPage {
 	protected void load(IProject project) {
 		linkingResourcesText.setText(StringUtil.nonNull(getLinkingResources(project)));
 		pluginLocationsText.setText(StringUtil.nonNull(getPluginLocations(project)));
+		compileJavaButton.setSelection(getCompileJava(project));
 	}
 
 	public static String getLinkingResources(IProject project) {
@@ -120,9 +132,18 @@ public class AsakusafwBatchCompilerPropertyPage extends PropertyPage {
 		return getValue(project, PLUGIN_LOCATIONS_KEY);
 	}
 
+	public static boolean getCompileJava(IProject project) {
+		String s = getValue(project, COMPILE_JAVA_KEY);
+		if (s == null) {
+			return true;
+		}
+		return Boolean.parseBoolean(s);
+	}
+
 	protected void save(IProject project) {
 		setValue(project, LINKING_RESOURCES_KEY, linkingResourcesText.getText());
 		setValue(project, PLUGIN_LOCATIONS_KEY, pluginLocationsText.getText());
+		setValue(project, COMPILE_JAVA_KEY, Boolean.toString(compileJavaButton.getSelection()));
 	}
 
 	private static String getValue(IProject project, String key) {

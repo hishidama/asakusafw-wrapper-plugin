@@ -7,6 +7,7 @@ import java.util.List;
 
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.LogUtil;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.task.BatchCompilerLaunchTask;
+import jp.hishidama.eclipse_plugin.asakusafw_wrapper.property.AsakusafwBatchCompilerPropertyPage;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.util.BatchUtil;
 import jp.hishidama.eclipse_plugin.util.JdtUtil;
 
@@ -18,6 +19,7 @@ import org.eclipse.core.commands.Parameterization;
 import org.eclipse.core.commands.ParameterizedCommand;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
@@ -48,7 +50,15 @@ public class BatchCompileHandler extends AbstractHandler {
 			return null;
 		}
 
-		launchCompileJava();
+		IProject project = null;
+		for (IType type : typeList) {
+			project = type.getJavaProject().getProject();
+			if (project != null) {
+				break;
+			}
+		}
+
+		launchCompileJava(project);
 		launchCompileBatch(typeList);
 
 		return null;
@@ -121,7 +131,14 @@ public class BatchCompileHandler extends AbstractHandler {
 		}
 	}
 
-	void launchCompileJava() throws ExecutionException {
+	void launchCompileJava(IProject project) throws ExecutionException {
+		if (project == null) {
+			return;
+		}
+		if (!AsakusafwBatchCompilerPropertyPage.getCompileJava(project)) {
+			return;
+		}
+
 		IServiceLocator serviceLocator = PlatformUI.getWorkbench();
 
 		try {
