@@ -102,8 +102,16 @@ public class PorterUtil {
 		try {
 			Class<?> clazz = ReflectionUtil.loadClass(javaProject, porterClassName);
 			Object object = clazz.newInstance();
-			Class<?> modelType = ReflectionUtil.get(object, "getModelType");
-			return modelType.getName();
+			Class<?> modelType = null;
+			try {
+				modelType = ReflectionUtil.get(object, "getModelType");
+			} catch (NoSuchMethodException e) {
+				modelType = ReflectionUtil.get(object, "getSupportedType");
+			}
+			if (modelType != null) {
+				return modelType.getName();
+			}
+			return null;
 		} catch (Exception e) {
 			return null;
 		}
@@ -125,7 +133,8 @@ public class PorterUtil {
 
 		try {
 			for (IMethod method : type.getMethods()) {
-				if (method.getElementName().equals("getModelType")) {
+				String name = method.getElementName();
+				if (name.equals("getModelType") || name.equals("getSupportedType")) {
 					return getModelClassName(method);
 				}
 			}
@@ -163,7 +172,7 @@ public class PorterUtil {
 		@Override
 		public boolean visit(MethodDeclaration node) {
 			String name = node.getName().getIdentifier();
-			if (name.equals("getModelType")) {
+			if (name.equals("getModelType") || name.equals("getSupportedType")) {
 				return true;
 			}
 			return false;
