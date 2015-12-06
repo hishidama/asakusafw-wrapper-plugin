@@ -55,11 +55,19 @@
             categoryId="jp.hishidama.asakusafwWrapper.category"
             id="jp.hishidama.asakusafwWrapper.command.batchCompile"
             name="Compile Batch">
+         <commandParameter
+               id="jp.hishidama.asakusafwWrapper.command.batchCompile.action"
+               name="action">
+         </commandParameter>
       </command>
       <command
             categoryId="jp.hishidama.asakusafwWrapper.category"
             id="jp.hishidama.asakusafwWrapper.command.batchCompile.editorMenu"
             name="Compile Batch">
+         <commandParameter
+               id="jp.hishidama.asakusafwWrapper.command.batchCompile.action"
+               name="action">
+         </commandParameter>
       </command>
    </extension>
    <extension
