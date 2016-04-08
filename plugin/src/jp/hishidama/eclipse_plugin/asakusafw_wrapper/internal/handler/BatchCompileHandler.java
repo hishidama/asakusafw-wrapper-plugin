@@ -67,11 +67,8 @@ public class BatchCompileHandler extends AbstractHandler {
 		beforeTypeList = result;
 
 		String action = event.getParameter("jp.hishidama.asakusafwWrapper.command.batchCompile.action");
-		if ("compileBatchapp".equalsIgnoreCase(action)) {
-			launchCompileBatchapp(elements);
-			return null;
-		} else if ("sparkCompileBatchapp".equalsIgnoreCase(action)) {
-			launchSparkCompileBatchapp(elements);
+		if (action != null) {
+			launchCompileBatchapp(elements, action);
 			return null;
 		}
 
@@ -207,13 +204,8 @@ public class BatchCompileHandler extends AbstractHandler {
 		job.schedule();
 	}
 
-	void launchCompileBatchapp(List<IJavaElement> elements) {
-		CompileBatchLauncher launcher = new CompileBatchLauncher("compileBatchapp");
-		launcher.launch(elements);
-	}
-
-	void launchSparkCompileBatchapp(List<IJavaElement> elements) {
-		CompileBatchLauncher launcher = new CompileBatchLauncher("sparkCompileBatchapps");
+	void launchCompileBatchapp(List<IJavaElement> elements, String taskName) {
+		CompileBatchLauncher launcher = new CompileBatchLauncher(taskName);
 		launcher.launch(elements);
 	}
 
