@@ -14,9 +14,15 @@ public class BatchUtil {
 	public static final String BATCH_NAME = "com.asakusafw.vocabulary.batch.Batch";
 	public static final String BATCH_DESCRIPTION_NAME = "com.asakusafw.vocabulary.batch.BatchDescription";
 	public static final String WORK_NAME = "com.asakusafw.vocabulary.batch.Work";
+	public static final String ITERATIVE_BATCH_NAME = "com.asakusafw.vocabulary.iterative.IterativeBatch";
 
 	public static boolean isBatch(IType type) {
 		return AnnotationUtil.getAnnotation(type, BATCH_NAME) != null
 				&& TypeUtil.isExtends(type, BATCH_DESCRIPTION_NAME);
+	}
+
+	public static boolean isIterativeBatch(IType type) {
+		return AnnotationUtil.getAnnotation(type, ITERATIVE_BATCH_NAME) != null
+				&& TypeUtil.isExtends(type, FlowUtil.FLOW_DESCRIPTION_NAME);
 	}
 }

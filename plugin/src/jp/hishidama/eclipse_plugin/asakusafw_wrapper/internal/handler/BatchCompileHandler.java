@@ -101,14 +101,14 @@ public class BatchCompileHandler extends AbstractHandler {
 	private List<IType> getBatchType(IJavaElement element) {
 		if (element instanceof IType) {
 			IType type = (IType) element;
-			if (BatchUtil.isBatch(type)) {
+			if (BatchUtil.isBatch(type) || BatchUtil.isIterativeBatch(type)) {
 				return Arrays.asList(type);
 			}
 		} else if (element instanceof ICompilationUnit) {
 			ICompilationUnit unit = (ICompilationUnit) element;
 			try {
 				for (IType type : unit.getTypes()) {
-					if (BatchUtil.isBatch(type)) {
+					if (BatchUtil.isBatch(type) || BatchUtil.isIterativeBatch(type)) {
 						return Arrays.asList(type);
 					}
 				}
@@ -223,25 +223,32 @@ public class BatchCompileHandler extends AbstractHandler {
 					return;
 				}
 			}
+			StringBuilder sb = new StringBuilder(128);
 			for (IJavaElement element : elements) {
 				String name = getBatchClassName(element);
 				if (name != null) {
-					launchAsakusafwTask(taskName, "--update", name);
+					if (sb.length() != 0) {
+						sb.append(",");
+					}
+					sb.append(name);
 				}
+			}
+			if (sb.length() > 0) {
+				launchAsakusafwTask(taskName, "--update", sb.toString());
 			}
 		}
 
 		private String getBatchClassName(IJavaElement element) {
 			if (element instanceof IType) {
 				IType type = (IType) element;
-				if (BatchUtil.isBatch(type)) {
+				if (BatchUtil.isBatch(type) || BatchUtil.isIterativeBatch(type)) {
 					return type.getFullyQualifiedName();
 				}
 			} else if (element instanceof ICompilationUnit) {
 				ICompilationUnit unit = (ICompilationUnit) element;
 				try {
 					for (IType type : unit.getTypes()) {
-						if (BatchUtil.isBatch(type)) {
+						if (BatchUtil.isBatch(type) || BatchUtil.isIterativeBatch(type)) {
 							return type.getFullyQualifiedName();
 						}
 					}
