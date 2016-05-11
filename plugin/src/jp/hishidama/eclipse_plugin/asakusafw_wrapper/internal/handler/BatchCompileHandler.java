@@ -9,6 +9,8 @@ import java.util.List;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.LogUtil;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.task.BatchCompilerLaunchTask;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.property.AsakusafwBatchCompilerPropertyPage;
+import jp.hishidama.eclipse_plugin.asakusafw_wrapper.property.AsakusafwCompileBatchappsPropertyPage;
+import jp.hishidama.eclipse_plugin.asakusafw_wrapper.property.AsakusafwCompileBatchappsPropertyPage.CommandLineOptionRow;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.util.BatchUtil;
 import jp.hishidama.eclipse_plugin.util.JdtUtil;
 
@@ -65,14 +67,14 @@ public class BatchCompileHandler extends AbstractHandler {
 			return null;
 		}
 		beforeTypeList = result;
+		IProject project = typeList.get(0).getJavaProject().getProject();
 
 		String action = event.getParameter("jp.hishidama.asakusafwWrapper.command.batchCompile.action");
 		if (action != null) {
-			launchCompileBatchapp(elements, action);
+			launchCompileBatchapp(project, elements, action);
 			return null;
 		}
 
-		IProject project = typeList.get(0).getJavaProject().getProject();
 		launchCompileJava(project);
 		launchCompileBatch(typeList);
 
@@ -167,17 +169,22 @@ public class BatchCompileHandler extends AbstractHandler {
 	}
 
 	private void launchAsakusafwTask(String taskName, String... args) {
-		StringBuilder sb = new StringBuilder(taskName);
-		for (String arg : args) {
-			sb.append(' ');
-			sb.append(arg);
+		String argLine;
+		{
+			StringBuilder sb = new StringBuilder(taskName);
+			for (String arg : args) {
+				sb.append(' ');
+				sb.append(arg);
+			}
+			argLine = sb.toString();
+			LogUtil.logInfo(argLine);
 		}
 
 		IServiceLocator serviceLocator = PlatformUI.getWorkbench();
 		try {
 			ICommandService commandService = (ICommandService) serviceLocator.getService(ICommandService.class);
 			Command command = commandService.getCommand("com.asakusafw.shafu.ui.buildProject");
-			Parameterization[] params = { new Parameterization(command.getParameter("taskNames"), sb.toString()) };
+			Parameterization[] params = { new Parameterization(command.getParameter("taskNames"), argLine) };
 			ParameterizedCommand parametrizedCommand = new ParameterizedCommand(command, params);
 
 			IHandlerService handlerService = (IHandlerService) serviceLocator.getService(IHandlerService.class);
@@ -204,9 +211,9 @@ public class BatchCompileHandler extends AbstractHandler {
 		job.schedule();
 	}
 
-	void launchCompileBatchapp(List<IJavaElement> elements, String taskName) {
+	void launchCompileBatchapp(IProject project, List<IJavaElement> elements, String taskName) {
 		CompileBatchLauncher launcher = new CompileBatchLauncher(taskName);
-		launcher.launch(elements);
+		launcher.launch(project, elements);
 	}
 
 	private class CompileBatchLauncher {
@@ -216,10 +223,28 @@ public class BatchCompileHandler extends AbstractHandler {
 			this.taskName = taskName;
 		}
 
-		public void launch(List<IJavaElement> elements) {
+		public void launch(IProject project, List<IJavaElement> elements) {
+			List<String> optionList = new ArrayList<String>();
+			{
+				List<CommandLineOptionRow> list = AsakusafwCompileBatchappsPropertyPage.getComandLineOptions(project,
+						taskName);
+				for (CommandLineOptionRow row : list) {
+					optionList.add(row.optionName);
+					StringBuilder sb = new StringBuilder(row.optionValue.length() + 8);
+					for (int i = 0; i < row.optionValue.length(); i++) {
+						char c = row.optionValue.charAt(i);
+						if (Character.isSpaceChar(c)) {
+							sb.append('\\');
+						}
+						sb.append(c);
+					}
+					optionList.add(sb.toString());
+				}
+			}
+
 			for (IJavaElement element : elements) {
 				if (element instanceof IJavaProject || element instanceof IPackageFragmentRoot) {
-					launchAsakusafwTask(taskName);
+					launchAsakusafwTask(taskName, optionList.toArray(new String[optionList.size()]));
 					return;
 				}
 			}
@@ -234,7 +259,9 @@ public class BatchCompileHandler extends AbstractHandler {
 				}
 			}
 			if (sb.length() > 0) {
-				launchAsakusafwTask(taskName, "--update", sb.toString());
+				optionList.add("--update");
+				optionList.add(sb.toString());
+				launchAsakusafwTask(taskName, optionList.toArray(new String[optionList.size()]));
 			}
 		}
 
