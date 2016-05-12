@@ -1,7 +1,6 @@
 package jp.hishidama.eclipse_plugin.asakusafw_wrapper.property;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.Activator;
@@ -63,8 +62,8 @@ public class AsakusafwCompileBatchappsPropertyPage extends PropertyPage {
 
 		optionTable = new CommandLineOptionsTable(composite);
 		optionTable.addColumn("compile type", 96 * 2, SWT.NONE);
-		optionTable.addColumn("option name", 128, SWT.NONE);
-		optionTable.addColumn("value", 128, SWT.NONE);
+		optionTable.addColumn("option name", 128 + 64, SWT.NONE);
+		optionTable.addColumn("value", 128 + 128, SWT.NONE);
 
 		Composite field = new Composite(composite, SWT.NONE);
 		// field.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -76,6 +75,12 @@ public class AsakusafwCompileBatchappsPropertyPage extends PropertyPage {
 		public String compileType;
 		public String optionName;
 		public String optionValue;
+
+		public CommandLineOptionRow(String compileType, String optionName, String optionValue) {
+			this.compileType = compileType;
+			this.optionName = optionName;
+			this.optionValue = optionValue;
+		}
 
 		@Override
 		protected CommandLineOptionRow clone() {
@@ -116,7 +121,7 @@ public class AsakusafwCompileBatchappsPropertyPage extends PropertyPage {
 
 		@Override
 		protected CommandLineOptionRow createElement() {
-			return new CommandLineOptionRow();
+			return new CommandLineOptionRow(null, null, null);
 		}
 
 		@Override
@@ -184,8 +189,8 @@ public class AsakusafwCompileBatchappsPropertyPage extends PropertyPage {
 
 		propertyTable = new CompilerPropertiesTable(composite);
 		propertyTable.addColumn("compile type", 96 * 2, SWT.NONE);
-		propertyTable.addColumn("property name", 128, SWT.NONE);
-		propertyTable.addColumn("value", 128, SWT.NONE);
+		propertyTable.addColumn("property name", 128 + 128, SWT.NONE);
+		propertyTable.addColumn("value", 128 + 64, SWT.NONE);
 
 		Composite field = new Composite(composite, SWT.NONE);
 		// field.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -197,6 +202,12 @@ public class AsakusafwCompileBatchappsPropertyPage extends PropertyPage {
 		public String compileType;
 		public String propertyName;
 		public String optionValue;
+
+		public CompilerPropertyRow(String compileType, String propertyName, String optionValue) {
+			this.compileType = compileType;
+			this.propertyName = propertyName;
+			this.optionValue = optionValue;
+		}
 
 		@Override
 		protected CompilerPropertyRow clone() {
@@ -237,7 +248,7 @@ public class AsakusafwCompileBatchappsPropertyPage extends PropertyPage {
 
 		@Override
 		protected CompilerPropertyRow createElement() {
-			return new CompilerPropertyRow();
+			return new CompilerPropertyRow(null, null, null);
 		}
 
 		@Override
@@ -301,16 +312,22 @@ public class AsakusafwCompileBatchappsPropertyPage extends PropertyPage {
 
 	@Override
 	protected void performDefaults() {
-		optionTable.removeAll();
-		List<CommandLineOptionRow> list = getDefaultCommandLineOption();
-		for (CommandLineOptionRow row : list) {
-			optionTable.addItem(row);
+		{
+			optionTable.removeAll();
+			List<CommandLineOptionRow> list = getDefaultCommandLineOption(null);
+			for (CommandLineOptionRow row : list) {
+				optionTable.addItem(row);
+			}
+			optionTable.refresh();
 		}
-		optionTable.refresh();
-
-		propertyTable.removeAll();
-		propertyTable.refresh();
-
+		{
+			propertyTable.removeAll();
+			List<CompilerPropertyRow> list = getDefaultCompilerProperty(null);
+			for (CompilerPropertyRow row : list) {
+				propertyTable.addItem(row);
+			}
+			propertyTable.refresh();
+		}
 		super.performDefaults();
 	}
 
@@ -357,62 +374,67 @@ public class AsakusafwCompileBatchappsPropertyPage extends PropertyPage {
 	private static List<CommandLineOptionRow> loadCommandLineOption(IProject project, String compileType) {
 		int count = getIntValue(project, COMMAND_LINE_OPTION_KEY);
 		if (count < 0) {
-			List<CommandLineOptionRow> list = getDefaultCommandLineOption();
-			List<CommandLineOptionRow> result = new ArrayList<CommandLineOptionRow>(list.size());
-			for (CommandLineOptionRow row : list) {
-				if (compileType == null || compileType.equals(row.compileType)) {
-					result.add(row);
-				}
-			}
-			return result;
+			return getDefaultCommandLineOption(compileType);
 		}
 		List<CommandLineOptionRow> list = new ArrayList<CommandLineOptionRow>(count);
 		for (int i = 0; i < count; i++) {
 			String type = getValue(project, COMMAND_LINE_OPTION_KEY, i, "type");
 			if (compileType == null || compileType.equals(type)) {
-				CommandLineOptionRow row = new CommandLineOptionRow();
-				row.compileType = type;
-				row.optionName = getValue(project, COMMAND_LINE_OPTION_KEY, i, "name");
-				row.optionValue = getValue(project, COMMAND_LINE_OPTION_KEY, i, "value");
-				list.add(row);
+				list.add(new CommandLineOptionRow(type, getValue(project, COMMAND_LINE_OPTION_KEY, i, "name"),
+						getValue(project, COMMAND_LINE_OPTION_KEY, i, "value")));
 			}
 		}
 		return list;
 	}
 
-	private static List<CommandLineOptionRow> getDefaultCommandLineOption() {
+	private static List<CommandLineOptionRow> getDefaultCommandLineOption(String compileType) {
 		List<CommandLineOptionRow> list = new ArrayList<CommandLineOptionRow>(2);
-		{
-			CommandLineOptionRow row = new CommandLineOptionRow();
-			row.compileType = "sparkCompileBatchapps";
-			row.optionName = "--fail-on-error";
-			row.optionValue = "true";
-			list.add(row);
+		if (compileType == null || "sparkCompileBatchapps".equals(compileType)) {
+			list.add(new CommandLineOptionRow("sparkCompileBatchapps", "--fail-on-error", "true"));
 		}
-		{
-			CommandLineOptionRow row = new CommandLineOptionRow();
-			row.compileType = "m3bpCompileBatchapps";
-			row.optionName = "--fail-on-error";
-			row.optionValue = "true";
-			list.add(row);
+		if (compileType == null || "m3bpCompileBatchapps".equals(compileType)) {
+			list.add(new CommandLineOptionRow("m3bpCompileBatchapps", "--fail-on-error", "true"));
 		}
 		return list;
 	}
 
 	private static List<CompilerPropertyRow> loadCompilerProperty(IProject project, String compileType) {
 		int count = getIntValue(project, COMPILER_PROPERTIES_KEY);
-		if (count <= 0) {
-			return Collections.emptyList();
+		if (count < 0) {
+			return getDefaultCompilerProperty(compileType);
 		}
 		List<CompilerPropertyRow> list = new ArrayList<CompilerPropertyRow>(count);
 		for (int i = 0; i < count; i++) {
 			String type = getValue(project, COMPILER_PROPERTIES_KEY, i, "type");
 			if (compileType == null || compileType.equals(type)) {
-				CompilerPropertyRow row = new CompilerPropertyRow();
-				row.compileType = type;
-				row.propertyName = getValue(project, COMPILER_PROPERTIES_KEY, i, "name");
-				row.optionValue = getValue(project, COMPILER_PROPERTIES_KEY, i, "value");
-				list.add(row);
+				list.add(new CompilerPropertyRow(type, getValue(project, COMPILER_PROPERTIES_KEY, i, "name"), getValue(
+						project, COMPILER_PROPERTIES_KEY, i, "value")));
+			}
+		}
+		return list;
+	}
+
+	private static List<CompilerPropertyRow> getDefaultCompilerProperty(String compileType) {
+		List<CompilerPropertyRow> list = new ArrayList<CompilerPropertyRow>(6);
+		if (compileType == null || "m3bpCompileBatchapps".equals(compileType)) {
+			String type = "m3bpCompileBatchapps";
+			String os = System.getProperty("os.name");
+			if (os != null && os.contains("Windows")) {
+				list.add(new CompilerPropertyRow(type, "m3bp.native.cmake", "cmake.exe"));
+				list.add(new CompilerPropertyRow(type, "m3bp.native.make", "make.exe"));
+				list.add(new CompilerPropertyRow(type, "m3bp.native.cmake.CMAKE_SYSTEM_NAME", "Linux"));
+				list.add(new CompilerPropertyRow(type, "m3bp.native.cmake.CMAKE_GENERATOR", "Unix Makefiles"));
+				list.add(new CompilerPropertyRow(type, "m3bp.native.cmake.CMAKE_C_COMPILER",
+						"x86_64-pc-linux-gnu-gcc.exe"));
+				list.add(new CompilerPropertyRow(type, "m3bp.native.cmake.CMAKE_CXX_COMPILER",
+						"x86_64-pc-linux-gnu-g++.exe"));
+			} else {
+				list.add(new CompilerPropertyRow(type, "m3bp.native.cmake", "cmake"));
+				list.add(new CompilerPropertyRow(type, "m3bp.native.make", "make"));
+				list.add(new CompilerPropertyRow(type, "m3bp.native.cmake.CMAKE_SYSTEM_NAME", "Linux"));
+				list.add(new CompilerPropertyRow(type, "m3bp.native.cmake.CMAKE_GENERATOR", "Unix Makefiles"));
+				list.add(new CompilerPropertyRow(type, "m3bp.native.cmake.CMAKE_C_COMPILER", "gcc"));
+				list.add(new CompilerPropertyRow(type, "m3bp.native.cmake.CMAKE_CXX_COMPILER", "g++"));
 			}
 		}
 		return list;
@@ -458,11 +480,7 @@ public class AsakusafwCompileBatchappsPropertyPage extends PropertyPage {
 				sb.append(row.optionValue);
 			}
 			if (sb.length() > 0) {
-				CommandLineOptionRow row = new CommandLineOptionRow();
-				row.compileType = compileType;
-				row.optionName = "--compiler-properties";
-				row.optionValue = sb.toString();
-				result.add(row);
+				result.add(new CommandLineOptionRow(compileType, "--compiler-properties", sb.toString()));
 			}
 		}
 
