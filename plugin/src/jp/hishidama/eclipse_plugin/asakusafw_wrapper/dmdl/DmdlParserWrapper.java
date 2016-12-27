@@ -65,8 +65,9 @@ public class DmdlParserWrapper {
 	}
 
 	protected void findClassPath(List<URL> list, IJavaProject javaProject) {
-		JdtUtil.collectProjectClassPath(list, javaProject);
 		this.project = javaProject.getProject();
+		ParserClassUtil.readDmdlPrefsClassPath(list, project);
+		JdtUtil.collectProjectClassPath(list, javaProject);
 		ParserClassUtil.getClassPath(list, project);
 	}
 

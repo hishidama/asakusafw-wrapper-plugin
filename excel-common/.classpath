@@ -21,6 +21,6 @@
 	<classpathentry exported="true" kind="lib" path="C:/Users/hishidama4/.gradle/caches/modules-2/files-2.1/com.asakusafw/simple-graph/0.5.3/9684e5f3c53bdb791b2aee73bd2c19bf3121d7db/simple-graph-0.5.3.jar" sourcepath="C:/Users/hishidama4/.gradle/caches/modules-2/files-2.1/com.asakusafw/simple-graph/0.5.3/a9515739328f498aae8fab5b0bb19a09e59a6b28/simple-graph-0.5.3-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="C:/Users/hishidama4/.gradle/caches/modules-2/files-2.1/com.asakusafw/asakusa-dmdl-core/0.5.3/495f23ffcf99d76753db77daf13ffd6b65a39cf4/asakusa-dmdl-core-0.5.3.jar" sourcepath="C:/Users/hishidama4/.gradle/caches/modules-2/files-2.1/com.asakusafw/asakusa-dmdl-core/0.5.3/27465b5d351bec15658b949343d2149181277f84/asakusa-dmdl-core-0.5.3-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="C:/Users/hishidama4/.gradle/caches/modules-2/files-2.1/commons-cli/commons-cli/1.2/2bf96b7aa8b611c177d329452af1dc933e14501c/commons-cli-1.2.jar" sourcepath="C:/Users/hishidama4/.gradle/caches/modules-2/files-2.1/commons-cli/commons-cli/1.2/6c5459816530a1962ac18cd315cc775b1b384329/commons-cli-1.2-sources.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/asakusafw-wrapper-jar"/>
+	<classpathentry kind="src" path="/asakusafw-wrapper-jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>

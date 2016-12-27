@@ -2,12 +2,18 @@ package jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.util;
 
 import static jp.hishidama.eclipse_plugin.util.StringUtil.isEmpty;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.TreeMap;
 
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.extension.AsakusafwConfiguration;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.extension.AsakusafwConfiguration.Library;
@@ -29,6 +35,58 @@ public class ParserClassUtil {
 	public static final String PARSER_BUILD_PROPERTIES = "AsakusafwWrapper.Parser.buildProperties";
 	public static final String PARSER_JAR_FILE_COUNT = "AsakusafwWrapper.Parser.jarFile.count";
 	public static final String PARSER_JAR_FILE = "AsakusafwWrapper.Parser.jarFile.";
+
+	public static void readDmdlPrefsClassPath(List<URL> list, IProject project) {
+		IFile file = project.getFile(".settings/com.asakusafw.dmdl.prefs");
+		if (!file.exists()) {
+			return;
+		}
+
+		Properties properties = new Properties();
+		{
+			InputStream is;
+			try {
+				is = file.getContents();
+			} catch (CoreException e) {
+				LogUtil.logWarn("ParserClassUtil#readDmdlPrefsClassPath() error", e);
+				return;
+			}
+			try {
+				properties.load(is);
+			} catch (IOException e) {
+				LogUtil.logWarn("ParserClassUtil#readDmdlPrefsClassPath() error", e);
+			} finally {
+				try {
+					is.close();
+				} catch (IOException e) {
+					LogUtil.logWarn("ParserClassUtil#readDmdlPrefsClassPath() error", e);
+				}
+			}
+		}
+
+		Map<Integer, String> map = new TreeMap<Integer, String>();
+		final int INDEX = "classpath.".length();
+		for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+			String key = (String) entry.getKey();
+			if (key.startsWith("classpath.")) {
+				int n;
+				try {
+					n = Integer.parseInt(key.substring(INDEX));
+				} catch (NumberFormatException e) {
+					LogUtil.logWarn("ParserClassUtil#readDmdlPrefsClassPath() error", e);
+					continue;
+				}
+				map.put(n, (String) entry.getValue());
+			}
+		}
+		for (String path : map.values()) {
+			try {
+				list.add(new File(path).toURI().toURL());
+			} catch (MalformedURLException e) {
+				LogUtil.logWarn("ParserClassUtil#readDmdlPrefsClassPath() error", e);
+			}
+		}
+	}
 
 	public static void getClassPath(List<URL> list, IProject project) {
 		List<Library> libs = getLibraries(project);

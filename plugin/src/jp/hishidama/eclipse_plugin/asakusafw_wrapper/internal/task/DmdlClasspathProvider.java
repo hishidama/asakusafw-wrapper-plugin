@@ -40,6 +40,7 @@ public class DmdlClasspathProvider extends StandardClasspathProvider {
 		IProject project = javaProject.getProject();
 
 		List<URL> list = new ArrayList<URL>();
+		ParserClassUtil.readDmdlPrefsClassPath(list, project);
 		ParserClassUtil.getClassPath(list, project);
 		findMyClassPath(list, "resource/dmdlparser-caller.jar");
 

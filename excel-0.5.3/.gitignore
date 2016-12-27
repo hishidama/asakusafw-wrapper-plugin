@@ -1,5 +1,6 @@
 /.buildtools
 /.gradle
+/.settings
 /classes
+/.project
 /.classpath
-/gradlew*
