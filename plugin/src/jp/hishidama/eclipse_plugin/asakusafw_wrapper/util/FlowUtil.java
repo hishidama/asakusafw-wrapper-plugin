@@ -1,11 +1,13 @@
 package jp.hishidama.eclipse_plugin.asakusafw_wrapper.util;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.LogUtil;
 import jp.hishidama.eclipse_plugin.jdt.util.AnnotationUtil;
 import jp.hishidama.eclipse_plugin.jdt.util.TypeUtil;
 
@@ -13,6 +15,7 @@ import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ILocalVariable;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.ITypeParameter;
 import org.eclipse.jdt.core.JavaModelException;
 
 /**
@@ -37,28 +40,42 @@ public class FlowUtil {
 	}
 
 	public static boolean isJobFlow(IType type) {
-		return AnnotationUtil.getAnnotation(type, JOBFLOW_NAME) != null
-				&& TypeUtil.isExtends(type, FLOW_DESCRIPTION_NAME);
+		return AnnotationUtil.getAnnotation(type, JOBFLOW_NAME) != null && TypeUtil.isExtends(type, FLOW_DESCRIPTION_NAME);
 	}
 
 	public static boolean isFlowPart(IType type) {
-		return AnnotationUtil.getAnnotation(type, FLOWPART_NAME) != null
-				&& TypeUtil.isExtends(type, FLOW_DESCRIPTION_NAME);
+		return AnnotationUtil.getAnnotation(type, FLOWPART_NAME) != null && TypeUtil.isExtends(type, FLOW_DESCRIPTION_NAME);
 	}
 
 	public static String getJobFlowName(IType type) {
 		return AnnotationUtil.getAnnotationValue(type, JOBFLOW_NAME, "name");
 	}
 
-	public static List<FlowParameter> getFlowParameters(IType type) {
+	public static class FlowParameters {
+		public final List<FlowParameter> parameterList = new ArrayList<FlowParameter>();
+		public final Map<String, String[]> typeParameterMap = new LinkedHashMap<String, String[]>();
+	}
+
+	public static FlowParameters getFlowParameters(IType type) {
+		FlowParameters result = new FlowParameters();
 		IMethod constructor = getConstructor(type);
 		if (constructor == null) {
-			return Collections.emptyList();
+			return result;
+		}
+
+		try {
+			ITypeParameter[] tpList = type.getTypeParameters();
+			for (ITypeParameter tp : tpList) {
+				String tpName = tp.getElementName();
+				String[] bounds = tp.getBounds();
+				result.typeParameterMap.put(tpName, bounds);
+			}
+		} catch (JavaModelException e) {
+			LogUtil.logWarn("getTypeParameters error.", e);
 		}
 
 		try {
 			ILocalVariable[] parameterList = constructor.getParameters();
-			List<FlowParameter> list = new ArrayList<FlowParameter>(parameterList.length);
 			for (ILocalVariable parameter : parameterList) {
 				String name = parameter.getElementName();
 				String typeName = TypeUtil.getVariableTypeName(parameter);
@@ -71,14 +88,13 @@ public class FlowUtil {
 				element.setName(name);
 				element.setType(typeName);
 				element.setPorterName(AnnotationUtil.<String> getAnnotationValue(porter, "name"));
-				element.setPorterClassName(TypeUtil.resolveTypeName(
-						AnnotationUtil.<String> getAnnotationValue(porter, "description"), type));
+				element.setPorterClassName(TypeUtil.resolveTypeName(AnnotationUtil.<String> getAnnotationValue(porter, "description"), type));
 
-				list.add(element);
+				result.parameterList.add(element);
 			}
-			return list;
+			return result;
 		} catch (JavaModelException e) {
-			return Collections.emptyList();
+			return result;
 		}
 	}
 

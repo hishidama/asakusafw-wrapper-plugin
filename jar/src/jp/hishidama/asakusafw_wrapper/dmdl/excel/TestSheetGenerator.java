@@ -1,13 +1,22 @@
 package jp.hishidama.asakusafw_wrapper.dmdl.excel;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
 
+import com.asakusafw.dmdl.model.AstAttribute;
+import com.asakusafw.dmdl.model.AstSimpleName;
 import com.asakusafw.dmdl.semantics.DmdlSemantics;
 import com.asakusafw.dmdl.semantics.ModelDeclaration;
+import com.asakusafw.dmdl.semantics.PropertyDeclaration;
 
 public abstract class TestSheetGenerator {
 
@@ -16,20 +25,17 @@ public abstract class TestSheetGenerator {
 	public void execute(DmdlSemantics dmdlSemantics, List<Map<String, String>> names) throws IOException {
 		this.dmdlSemantics = dmdlSemantics;
 
-		StringBuilder sb = new StringBuilder(128);
-
+		Set<String> errorSet = new LinkedHashSet<String>();
 		Map<String, List<SheetInfo>> map = new LinkedHashMap<String, List<SheetInfo>>();
 		for (Map<String, String> name : names) {
 			SheetInfo info = new SheetInfo(name);
 
-			String srcModelName = info.getSrcModelName();
-			if (findModelDeclaration(srcModelName) == null) {
-				if (sb.length() == 0) {
-					sb.append("モデル定義が見つかりませんでした\n");
-				} else {
-					sb.append("\n");
+			String srcModelNames = info.getSrcModelName();
+			for (String s : srcModelNames.split(Pattern.quote("+"))) {
+				String srcModelName = s.trim();
+				if (findModelDeclaration(srcModelName) == null) {
+					errorSet.add(srcModelName);
 				}
-				sb.append(srcModelName);
 			}
 
 			String key = info.getDstBookName();
@@ -41,8 +47,8 @@ public abstract class TestSheetGenerator {
 			list.add(info);
 		}
 
-		if (sb.length() != 0) {
-			throw new IOException(sb.toString());
+		if (!errorSet.isEmpty()) {
+			throw new IOException(MessageFormat.format("モデル定義が見つかりませんでした\nmodel={0}", errorSet));
 		}
 		generate(map);
 	}
@@ -88,7 +94,45 @@ public abstract class TestSheetGenerator {
 	}
 
 	protected final ModelDeclaration findModelDeclaration(String modelName) {
+		if (modelName == null) {
+			return null;
+		}
+		if (modelName.contains("+")) {
+			CompositeModelDeclaration result = new CompositeModelDeclaration(dmdlSemantics, modelName);
+			String[] ss = modelName.split(Pattern.quote("+"));
+			for (String s : ss) {
+				ModelDeclaration model = dmdlSemantics.findModelDeclaration(s.trim());
+				if (model != null) {
+					result.addProperties(model);
+				}
+			}
+			return result;
+		}
+
 		return dmdlSemantics.findModelDeclaration(modelName);
+	}
+
+	static class CompositeModelDeclaration extends ModelDeclaration {
+		private final Set<String> nameSet = new HashSet<String>();
+		private final List<PropertyDeclaration> propertyList = new ArrayList<PropertyDeclaration>();
+
+		public CompositeModelDeclaration(DmdlSemantics owner, String name) {
+			super(owner, null, new AstSimpleName(null, name), null, Collections.<AstAttribute> emptyList());
+		}
+
+		public void addProperties(ModelDeclaration model) {
+			for (PropertyDeclaration p : model.getDeclaredProperties()) {
+				String name = p.getName().identifier;
+				if (nameSet.add(name)) {
+					propertyList.add(p);
+				}
+			}
+		}
+
+		@Override
+		public List<PropertyDeclaration> getDeclaredProperties() {
+			return propertyList;
+		}
 	}
 
 	protected abstract void generate(Map<String, List<SheetInfo>> map) throws IOException;
