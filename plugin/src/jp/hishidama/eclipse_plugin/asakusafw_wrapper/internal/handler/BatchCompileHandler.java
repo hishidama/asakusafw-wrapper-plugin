@@ -45,6 +45,7 @@ import org.eclipse.ui.services.IServiceLocator;
 public class BatchCompileHandler extends AbstractHandler {
 
 	private BatchList beforeTypeList = null;
+	private String beforeAction = null;
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -70,8 +71,16 @@ public class BatchCompileHandler extends AbstractHandler {
 		IProject project = typeList.get(0).getJavaProject().getProject();
 
 		String action = event.getParameter("jp.hishidama.asakusafwWrapper.command.batchCompile.action");
+		if ("recompile".equals(action)) {
+			if (beforeAction == null) {
+				MessageDialog.openInformation(null, "Batch compile", "コンパイルの種類を選択してから実行して下さい。");
+				return null;
+			}
+			action = beforeAction;
+		}
 		if (action != null) {
 			launchCompileBatchapp(project, elements, action);
+			beforeAction = action;
 			return null;
 		}
 
@@ -177,7 +186,7 @@ public class BatchCompileHandler extends AbstractHandler {
 				sb.append(arg);
 			}
 			argLine = sb.toString();
-			LogUtil.logInfo(argLine);
+			LogUtil.logInfo("BatchCompileHandler.launchAsakusafwTask: "+argLine);
 		}
 
 		IServiceLocator serviceLocator = PlatformUI.getWorkbench();
@@ -191,8 +200,7 @@ public class BatchCompileHandler extends AbstractHandler {
 			handlerService.executeCommand(parametrizedCommand, null);
 		} catch (Exception e) {
 			LogUtil.logWarn("Shafu execute error", e);
-			MessageDialog.openWarning(null, "Batch compile : " + taskName,
-					MessageFormat.format("Shafuの{0}コマンドの実行に失敗しました。\nShafuがインストールされているかどうか確認して下さい。", taskName));
+			MessageDialog.openWarning(null, "Batch compile : " + taskName, MessageFormat.format("Shafuの{0}コマンドの実行に失敗しました。\nShafuがインストールされているかどうか確認して下さい。", taskName));
 		}
 	}
 
@@ -226,8 +234,7 @@ public class BatchCompileHandler extends AbstractHandler {
 		public void launch(IProject project, List<IJavaElement> elements) {
 			List<String> optionList = new ArrayList<String>();
 			{
-				List<CommandLineOptionRow> list = AsakusafwCompileBatchappsPropertyPage.getComandLineOptions(project,
-						taskName);
+				List<CommandLineOptionRow> list = AsakusafwCompileBatchappsPropertyPage.getComandLineOptions(project, taskName);
 				for (CommandLineOptionRow row : list) {
 					optionList.add(row.optionName);
 					StringBuilder sb = new StringBuilder(row.optionValue.length() + 8);
