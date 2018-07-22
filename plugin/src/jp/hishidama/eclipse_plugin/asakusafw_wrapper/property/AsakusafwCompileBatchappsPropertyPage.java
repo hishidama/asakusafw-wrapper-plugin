@@ -19,6 +19,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -28,11 +29,12 @@ import org.eclipse.ui.dialogs.PropertyPage;
 
 public class AsakusafwCompileBatchappsPropertyPage extends PropertyPage {
 
+	public static final String USE_GRALDE_URL_KEY = "AsakusafwCompileBatchappsPropertyPage.USE_GRADLE_URL";
 	public static final String COMMAND_LINE_OPTION_KEY = "AsakusafwCompileBatchappsPropertyPage.COMMAND_LINE_OPTIONS";
 	public static final String COMPILER_PROPERTIES_KEY = "AsakusafwCompileBatchappsPropertyPage.COMPILER_PROPERTIES";
 
+	private Button useGradleUrlButton;
 	private CommandLineOptionsTable optionTable;
-
 	private CompilerPropertiesTable propertyTable;
 
 	public AsakusafwCompileBatchappsPropertyPage() {
@@ -49,11 +51,17 @@ public class AsakusafwCompileBatchappsPropertyPage extends PropertyPage {
 			composite.setLayout(layout);
 		}
 
+		createUseGradleUrlField(composite);
 		createCommandLineOptionField(composite);
 		createCompilerPropertyField(composite);
 		load(getProject());
 
 		return composite;
+	}
+
+	private void createUseGradleUrlField(Composite composite) {
+		useGradleUrlButton = new Button(composite, SWT.CHECK);
+		useGradleUrlButton.setText("GradleバージョンにPROJECT/.buildtools/gradlew.propertiesを使用する");
 	}
 
 	private void createCommandLineOptionField(Composite composite) {
@@ -312,6 +320,7 @@ public class AsakusafwCompileBatchappsPropertyPage extends PropertyPage {
 
 	@Override
 	protected void performDefaults() {
+		useGradleUrlButton.setSelection(true);
 		{
 			optionTable.removeAll();
 			List<CommandLineOptionRow> list = getDefaultCommandLineOption(null);
@@ -355,6 +364,7 @@ public class AsakusafwCompileBatchappsPropertyPage extends PropertyPage {
 	}
 
 	protected void load(IProject project) {
+		useGradleUrlButton.setSelection(getUseGradleUrl(project));
 		{
 			List<CommandLineOptionRow> list = loadCommandLineOption(project, null);
 			for (CommandLineOptionRow row : list) {
@@ -371,6 +381,14 @@ public class AsakusafwCompileBatchappsPropertyPage extends PropertyPage {
 		}
 	}
 
+	public static boolean getUseGradleUrl(IProject project) {
+		String s = getValue(project, USE_GRALDE_URL_KEY);
+		if (s == null) {
+			return true;
+		}
+		return Boolean.parseBoolean(s);
+	}
+
 	private static List<CommandLineOptionRow> loadCommandLineOption(IProject project, String compileType) {
 		int count = getIntValue(project, COMMAND_LINE_OPTION_KEY);
 		if (count < 0) {
@@ -380,8 +398,7 @@ public class AsakusafwCompileBatchappsPropertyPage extends PropertyPage {
 		for (int i = 0; i < count; i++) {
 			String type = getValue(project, COMMAND_LINE_OPTION_KEY, i, "type");
 			if (compileType == null || compileType.equals(type)) {
-				list.add(new CommandLineOptionRow(type, getValue(project, COMMAND_LINE_OPTION_KEY, i, "name"),
-						getValue(project, COMMAND_LINE_OPTION_KEY, i, "value")));
+				list.add(new CommandLineOptionRow(type, getValue(project, COMMAND_LINE_OPTION_KEY, i, "name"), getValue(project, COMMAND_LINE_OPTION_KEY, i, "value")));
 			}
 		}
 		return list;
@@ -407,8 +424,7 @@ public class AsakusafwCompileBatchappsPropertyPage extends PropertyPage {
 		for (int i = 0; i < count; i++) {
 			String type = getValue(project, COMPILER_PROPERTIES_KEY, i, "type");
 			if (compileType == null || compileType.equals(type)) {
-				list.add(new CompilerPropertyRow(type, getValue(project, COMPILER_PROPERTIES_KEY, i, "name"), getValue(
-						project, COMPILER_PROPERTIES_KEY, i, "value")));
+				list.add(new CompilerPropertyRow(type, getValue(project, COMPILER_PROPERTIES_KEY, i, "name"), getValue(project, COMPILER_PROPERTIES_KEY, i, "value")));
 			}
 		}
 		return list;
@@ -424,10 +440,8 @@ public class AsakusafwCompileBatchappsPropertyPage extends PropertyPage {
 				list.add(new CompilerPropertyRow(type, "m3bp.native.make", "make.exe"));
 				list.add(new CompilerPropertyRow(type, "m3bp.native.cmake.CMAKE_SYSTEM_NAME", "Linux"));
 				list.add(new CompilerPropertyRow(type, "m3bp.native.cmake.CMAKE_GENERATOR", "Unix Makefiles"));
-				list.add(new CompilerPropertyRow(type, "m3bp.native.cmake.CMAKE_C_COMPILER",
-						"x86_64-pc-linux-gnu-gcc.exe"));
-				list.add(new CompilerPropertyRow(type, "m3bp.native.cmake.CMAKE_CXX_COMPILER",
-						"x86_64-pc-linux-gnu-g++.exe"));
+				list.add(new CompilerPropertyRow(type, "m3bp.native.cmake.CMAKE_C_COMPILER", "x86_64-pc-linux-gnu-gcc.exe"));
+				list.add(new CompilerPropertyRow(type, "m3bp.native.cmake.CMAKE_CXX_COMPILER", "x86_64-pc-linux-gnu-g++.exe"));
 			} else {
 				list.add(new CompilerPropertyRow(type, "m3bp.native.cmake", "cmake"));
 				list.add(new CompilerPropertyRow(type, "m3bp.native.make", "make"));
@@ -441,6 +455,7 @@ public class AsakusafwCompileBatchappsPropertyPage extends PropertyPage {
 	}
 
 	protected void save(IProject project) {
+		setValue(project, USE_GRALDE_URL_KEY, Boolean.toString(useGradleUrlButton.getSelection()));
 		{
 			List<CommandLineOptionRow> list = optionTable.getElementList();
 			setValue(project, COMMAND_LINE_OPTION_KEY, list.size());

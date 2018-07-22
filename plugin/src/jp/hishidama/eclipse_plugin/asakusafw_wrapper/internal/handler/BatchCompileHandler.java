@@ -1,10 +1,12 @@
 package jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.handler;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.LogUtil;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.internal.task.BatchCompilerLaunchTask;
@@ -12,6 +14,7 @@ import jp.hishidama.eclipse_plugin.asakusafw_wrapper.property.AsakusafwBatchComp
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.property.AsakusafwCompileBatchappsPropertyPage;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.property.AsakusafwCompileBatchappsPropertyPage.CommandLineOptionRow;
 import jp.hishidama.eclipse_plugin.asakusafw_wrapper.util.BatchUtil;
+import jp.hishidama.eclipse_plugin.util.FileUtil;
 import jp.hishidama.eclipse_plugin.util.JdtUtil;
 
 import org.eclipse.core.commands.AbstractHandler;
@@ -174,19 +177,27 @@ public class BatchCompileHandler extends AbstractHandler {
 			return;
 		}
 
-		launchAsakusafwTask("compileJava");
+		String gradleDistribution = getGradleDistribution(project);
+		launchAsakusafwTask(gradleDistribution, "compileJava");
 	}
 
-	private void launchAsakusafwTask(String taskName, String... args) {
+	private void launchAsakusafwTask(String gradleDistribution, String taskName, String... args) {
 		String argLine;
 		{
-			StringBuilder sb = new StringBuilder(taskName);
+			StringBuilder sb = new StringBuilder(256);
+			if (gradleDistribution != null) {
+				// Shafuの機能。@付きでGradleのdistributionUrlを指定すると、そのバージョンのGradleで実行される
+				sb.append('@');
+				sb.append(gradleDistribution);
+				sb.append(' ');
+			}
+			sb.append(taskName);
 			for (String arg : args) {
 				sb.append(' ');
 				sb.append(arg);
 			}
 			argLine = sb.toString();
-			LogUtil.logInfo("BatchCompileHandler.launchAsakusafwTask: "+argLine);
+			LogUtil.logInfo("BatchCompileHandler.launchAsakusafwTask: " + argLine);
 		}
 
 		IServiceLocator serviceLocator = PlatformUI.getWorkbench();
@@ -202,6 +213,26 @@ public class BatchCompileHandler extends AbstractHandler {
 			LogUtil.logWarn("Shafu execute error", e);
 			MessageDialog.openWarning(null, "Batch compile : " + taskName, MessageFormat.format("Shafuの{0}コマンドの実行に失敗しました。\nShafuがインストールされているかどうか確認して下さい。", taskName));
 		}
+	}
+
+	private String getGradleDistribution(IProject project) {
+		boolean use = AsakusafwCompileBatchappsPropertyPage.getUseGradleUrl(project);
+		if (!use) {
+			return null;
+		}
+
+		Properties properties;
+		try {
+			properties = FileUtil.loadProperties(project, ".buildtools/gradlew.properties");
+		} catch (IOException e) {
+			return null;
+		}
+
+		String s = properties.getProperty("distributionUrl");
+		if (s == null) {
+			return null;
+		}
+		return s.replaceAll("\\:", ":");
 	}
 
 	void launchCompileBatch(List<IType> typeList) {
@@ -249,9 +280,10 @@ public class BatchCompileHandler extends AbstractHandler {
 				}
 			}
 
+			String gradleDistribution = getGradleDistribution(project);
 			for (IJavaElement element : elements) {
 				if (element instanceof IJavaProject || element instanceof IPackageFragmentRoot) {
-					launchAsakusafwTask(taskName, optionList.toArray(new String[optionList.size()]));
+					launchAsakusafwTask(gradleDistribution, taskName, optionList.toArray(new String[optionList.size()]));
 					return;
 				}
 			}
@@ -268,7 +300,7 @@ public class BatchCompileHandler extends AbstractHandler {
 			if (sb.length() > 0) {
 				optionList.add("--update");
 				optionList.add(sb.toString());
-				launchAsakusafwTask(taskName, optionList.toArray(new String[optionList.size()]));
+				launchAsakusafwTask(gradleDistribution, taskName, optionList.toArray(new String[optionList.size()]));
 			}
 		}
 
