@@ -152,7 +152,7 @@ public class BatchCompileHandler extends AbstractHandler {
 		try {
 			for (IResource member : container.members()) {
 				if (member instanceof IFile) {
-					ICompilationUnit unit = JdtUtil.getJavaUnit((IFile) member);
+					ICompilationUnit unit = JdtUtil.getCompilationUnit((IFile) member);
 					if (unit != null) {
 						for (IType type : unit.getTypes()) {
 							if (BatchUtil.isBatch(type)) {
