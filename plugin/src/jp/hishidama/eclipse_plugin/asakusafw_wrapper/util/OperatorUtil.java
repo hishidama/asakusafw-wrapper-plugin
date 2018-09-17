@@ -7,7 +7,10 @@ import jp.hishidama.eclipse_plugin.asakusafw_wrapper.operator.OperatorType;
 import jp.hishidama.eclipse_plugin.jdt.util.AnnotationUtil;
 import jp.hishidama.eclipse_plugin.util.StringUtil;
 
+import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 
 public class OperatorUtil {
 
@@ -56,5 +59,22 @@ public class OperatorUtil {
 
 	public static boolean isMasterSelection(IMethod method) {
 		return isOperator(method, OperatorType.MASTER_SELECTION);
+	}
+
+	public static boolean isOperator(IType type) {
+		try {
+			int flag = type.getFlags();
+			if ((flag & Flags.AccAbstract) == 0) {
+				return false;
+			}
+			for (IMethod method : type.getMethods()) {
+				if (isUserOperator(method)) {
+					return true;
+				}
+			}
+		} catch (JavaModelException e) {
+			// fall through
+		}
+		return false;
 	}
 }
