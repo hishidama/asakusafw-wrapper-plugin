@@ -24,6 +24,12 @@ public class OpenDeclaredOperatorHyperlinkDetector extends JdtHyperlinkDetector 
 		return new IHyperlink[] { new DeclaredOperatorHyperlink(operator, word) };
 	}
 
+	@Override
+	protected IHyperlink[] detectConstructorHyperlinks(IMethod method, IRegion word) {
+		IType type = (IType) method.getParent();
+		return detectTypeHyperlinks(type, word);
+	}
+
 	private IHyperlink[] detectMemberTypeHyperlinks(IType type, IRegion word) {
 		IType parent = type.getDeclaringType();
 		if (parent == null) {
@@ -71,8 +77,7 @@ public class OpenDeclaredOperatorHyperlinkDetector extends JdtHyperlinkDetector 
 	}
 
 	private IType getOperator(IType type) {
-		String value = AnnotationUtil.getAnnotationValue(type, "com.asakusafw.vocabulary.operator.OperatorFactory",
-				"value");
+		String value = AnnotationUtil.getAnnotationValue(type, "com.asakusafw.vocabulary.operator.OperatorFactory", "value");
 		if (value == null) {
 			return null;
 		}
